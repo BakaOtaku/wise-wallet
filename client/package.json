@@ -1,0 +1,41 @@
+{
+  "name": "wisewallet",
+  "version": "1.0.0",
+  "private": true,
+  "author": "@amanraj1608",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@cityofzion/neon-js": "^5.0.0-next.17",
+    "@emotion/react": "11.10.6",
+    "@emotion/styled": "11.10.6",
+    "@mui/icons-material": "5.11.11",
+    "@mui/lab": "^5.0.0-alpha.123",
+    "@mui/material": "5.11.12",
+    "@mui/styles": "5.11.12",
+    "@rentfuse-labs/neo-wallet-adapter-base": "^0.4.0",
+    "@rentfuse-labs/neo-wallet-adapter-react": "^0.4.0",
+    "@rentfuse-labs/neo-wallet-adapter-react-ui": "^0.4.0",
+    "@rentfuse-labs/neo-wallet-adapter-wallets": "^0.4.4",
+    "@types/node": "^18.15.3",
+    "bignumber.js": "^9.1.1",
+    "buffer": "^6.0.3",
+    "react": "18.2.0",
+    "react-blockies": "^1.4.1",
+    "react-dom": "18.2.0",
+    "react-router-dom": "^5.3.4",
+    "react-toastify": "^9.1.2"
+  },
+  "devDependencies": {
+    "@types/react": "^18.0.28",
+    "@types/react-dom": "^18.0.11",
+    "@types/react-router-dom": "^5.3.3",
+    "@vitejs/plugin-react": "3.1.0",
+    "typescript": "5.0.2",
+    "vite": "4.2.0",
+    "vite-tsconfig-paths": "^4.0.7"
+  }
+}
