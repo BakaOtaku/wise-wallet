@@ -1,0 +1,36 @@
+name: swap
+sourceurl: http://example.com/
+safemethods: []
+supportedstandards: []
+events:
+    - name: "swap"
+      parameters:
+        - name: input
+          type: Hash160
+
+        - name: to
+          type: Hash160
+
+        - name: amount
+          type: Integer
+
+    - name: "neo"
+      parameters:
+        - name: input
+          type: Boolean
+
+    - name: "gas"
+      parameters:
+        - name: input
+          type: Boolean
+
+
+
+    - name: "nep17payment"
+      parameters:
+        - name: send
+          type: Integer
+
+
+permissions:
+    - methods: '*'
