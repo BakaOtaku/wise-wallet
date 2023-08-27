@@ -36,7 +36,7 @@ const Main = () => {
                 Live Demo
               </Link>
             </div>
-            {/* <div className={classes.tradeImg}></div> */}
+            <div className={classes.tradeImg}></div>
           </div>
         </div>
       </div>
@@ -119,7 +119,7 @@ const useStyles = makeStyles((theme) => ({
   tradeImg: {
     width: "100%",
     height: "450px",
-    background: "url(/img/trade.png) 0% 0% / cover no-repeat",
+    background: "url(/img/demo.png) 0% 0% / cover no-repeat",
   },
 }));
 

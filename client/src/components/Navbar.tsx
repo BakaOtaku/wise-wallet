@@ -43,12 +43,12 @@ const Navbar = () => {
                 Intents
               </NavLink>
 
-              <NavLink
+              {/* <NavLink
                 to="/passkeys"
                 className={(isActive) => `menuItem ${isActive ? "active" : ""}`}
               >
                 Passkeys
-              </NavLink>
+              </NavLink> */}
 
               <a
                 href="https://arpitsrivastava2012.gitbook.io/wisewallet"

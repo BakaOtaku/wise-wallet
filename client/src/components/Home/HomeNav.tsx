@@ -13,9 +13,14 @@ const Navbar = () => {
 
       <div className={classes.rightSec}>
         <div className={classes.menuItemContainer}>
-          <Link to="/intent" className="menuItem">
-            Test it out
-          </Link>
+          <a
+            href="https://arpitsrivastava2012.gitbook.io/wisewallet"
+            className="menuItem"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Check out docs
+          </a>
         </div>
       </div>
     </div>

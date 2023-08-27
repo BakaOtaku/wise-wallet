@@ -64,15 +64,21 @@ const Why = () => {
                 <div className="list2Item">
                   <img src="/svg/transparent.svg" alt="" />
                   <div>
-                    <div className="property-title">Use case 1.</div>
-                    <div className="property-text">hehe</div>
+                    <div className="property-title">Solvers.</div>
+                    <div className="property-text">
+                      Solvers are the modules that solve the intents. They are
+                      the ones that construct the complete transaction.
+                    </div>
                   </div>
                 </div>
                 <div className="list2Item">
                   <img src="/svg/seamless.svg" alt="" />
                   <div>
-                    <div className="property-title">Use case 2.</div>
-                    <div className="property-text">hehe</div>
+                    <div className="property-title">Marketplace.</div>
+                    <div className="property-text">
+                      The marketplace is a place where you can find solvers that
+                      solve intents.
+                    </div>
                   </div>
                 </div>
               </div>
