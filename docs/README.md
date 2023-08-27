@@ -1,2 +1,1 @@
-Use Gitbook or Docasarous
-Add whitepaper
+### https://arpitsrivastava2012.gitbook.io/wisewallet

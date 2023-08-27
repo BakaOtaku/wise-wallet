@@ -1,5 +1,9 @@
-import { Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post } from '@nestjs/common';
 import { RelayerService } from './relayer.service';
+
+export class BodyDto {
+  signature: string;
+}
 
 @Controller('relay')
 export class RelayerController {
@@ -7,11 +11,11 @@ export class RelayerController {
 
   @Get('/')
   async getStatus() {
-    return this.relayerService.relay();
+    return this.relayerService.getStatus();
   }
 
   @Post('/')
-  async relay() {
-    return this.relayerService.relay();
+  async relay(@Body() signatureDto: BodyDto) {
+    return this.relayerService.relay(signatureDto.signature);
   }
 }

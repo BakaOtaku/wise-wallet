@@ -50,12 +50,14 @@ const Navbar = () => {
                 Passkeys
               </NavLink>
 
-              <NavLink
-                to="/docs"
-                className={(isActive) => `menuItem ${isActive ? "active" : ""}`}
+              <a
+                href="https://arpitsrivastava2012.gitbook.io/wisewallet"
+                className="menuItem"
+                target="_blank"
+                rel="noopener noreferrer"
               >
                 Docs
-              </NavLink>
+              </a>
             </div>
 
             <WalletMultiButton

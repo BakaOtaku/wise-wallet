@@ -1,111 +1,85 @@
 import { Injectable } from '@nestjs/common';
-import { CONST, rpc, sc, wallet, tx, u } from '@cityofzion/neon-js';
+import { experimental, sc, tx, CONST, wallet } from '@cityofzion/neon-js';
 import { chainConfig } from '../config';
+import { SmartContract } from '@cityofzion/neon-js/lib/experimental';
 
-const entryPointContract = '15c242e922f02edbbaec071a62ada259642eca17';
-const limitContract = '2205277ae32b05fc41f0cf049e01bc7449908bdc';
+const entryPointAddr = '47e8ed3c15c53cc44965822bc1f46fe332cce4fe';
+const config = {
+  rpcAddress: 'https://testnet2.neo.coz.io',
+  account: new wallet.Account(chainConfig.privateKey),
+  networkMagic: CONST.MAGIC_NUMBER.TestNet,
+};
 
 @Injectable()
 export class RelayerService {
-  neoClient: any;
+  entryPoint: SmartContract;
   wallet: any;
-  txNetworkFee = u.BigInteger.fromNumber(0);
-  networkFee = 0;
 
   constructor() {
-    const rpcClient = new rpc.RPCClient(chainConfig.rpcURL);
-    this.neoClient = rpcClient;
+    const entryPoint = new experimental.SmartContract(
+      entryPointAddr as any,
+      config,
+    );
+    this.entryPoint = entryPoint;
 
     const walletInstance = new wallet.Account(chainConfig.privateKey);
     this.wallet = walletInstance;
   }
 
-  async relay(): Promise<number> {
+  async relay(signature: string): Promise<{
+    txid: string;
+  }> {
     try {
-      const script = sc.createScript({
-        scriptHash: entryPointContract,
-        operation: 'handleOps',
-        args: [
+      console.log('Relaying transaction...', signature);
+      const signers = [
+        new tx.Signer({
+          account: config.account.scriptHash,
+          scopes: tx.WitnessScope.CalledByEntry,
+        }),
+      ];
+      const neworacleAddr = 'c1913f86e176fb82ac1b9efb745a945b3a1e5b90';
+      const swapAddr = '01464f6394107d76978d7614b9a7a01d0cc71e34';
+      const txHash = await this.entryPoint.invoke(
+        'innerHandleOp',
+        [
           sc.ContractParam.array(
-            sc.ContractParam.hash160(this.wallet.address),
-            sc.ContractParam.hash160(limitContract),
-            sc.ContractParam.string('request'),
-            sc.ContractParam.integer(0), // nonce
-            sc.ContractParam.byteArray('0x'), // initCode
-            sc.ContractParam.byteArray(''), // callData
-            sc.ContractParam.byteArray(''), // paymasterData
-            sc.ContractParam.byteArray(''), // sginature
+            sc.ContractParam.hash160(this.wallet.scriptHash),
+            sc.ContractParam.hash160(neworacleAddr),
+            sc.ContractParam.string('requestencodedirect'),
+            sc.ContractParam.integer(0),
+            sc.ContractParam.byteArray(''),
+            sc.ContractParam.string(
+              'https://www.pricemap.amanraj.dev/api/price/some',
+            ),
+            sc.ContractParam.string('$.price'),
+            sc.ContractParam.array(
+              sc.ContractParam.hash160(CONST.NATIVE_CONTRACT_HASH.NeoToken),
+              sc.ContractParam.hash160(CONST.NATIVE_CONTRACT_HASH.GasToken),
+              sc.ContractParam.integer(10),
+              sc.ContractParam.hash160(this.wallet.scriptHash),
+              sc.ContractParam.hash160(swapAddr),
+              sc.ContractParam.integer(100),
+              sc.ContractParam.integer(100),
+            ),
+            sc.ContractParam.byteArray(''),
+            sc.ContractParam.hash256(signature.substring(0, 64)),
             sc.ContractParam.publicKey(
-              '0297ddeeeba60055b5772b12d53fef80cd08406174ca88b88aa88967ad49150941',
-            ), // publicKey
-            sc.ContractParam.integer(1000), // gasLimit
-            sc.ContractParam.boolean(false), // gasMode (sponsored)
+              '02028a99826edc0c97d18e22b6932373d908d323aa7f92656a77ec26e8861699ef',
+            ),
+            sc.ContractParam.integer(0),
+            sc.ContractParam.boolean(true),
           ),
-          sc.ContractParam.hash160(this.wallet.address),
         ],
-      });
-      console.log(script);
-      // We retrieve the current block height as we need to
-      const currentHeight = await this.neoClient.getBlockCount();
-      await this.checkBalance();
-      const rawTx = new tx.Transaction({
-        signers: [
-          {
-            account: this.wallet.scriptHash,
-            scopes: tx.WitnessScope.CalledByEntry,
-          },
-        ],
-        validUntilBlock: currentHeight + 1000,
-        script: script,
-      });
-
-      const signedTransaction = rawTx.sign(
-        this.wallet,
-        CONST.MAGIC_NUMBER.TestNet,
+        signers,
       );
-      console.log('\n\n--- Signed transaction ---');
-
-      console.log(rawTx.toJson());
-      const result = await this.neoClient.sendRawTransaction(
-        u.HexString.fromHex(signedTransaction.serialize(true)),
-      );
-
       console.log('\n\n--- Transaction hash ---');
-      console.log(result);
+      console.log(txHash);
 
-      return result;
+      return {
+        txid: txHash,
+      };
     } catch (error) {
       console.error(error);
-    }
-  }
-
-  async checkBalance() {
-    let balanceResponse;
-    try {
-      balanceResponse = await this.neoClient.execute(
-        new rpc.Query({
-          method: 'getnep17balances',
-          params: [this.wallet.address],
-        }),
-      );
-    } catch (e) {
-      console.log(e);
-      console.log(
-        '\u001b[31m  ✗ Unable to get balances as plugin was not available. \u001b[0m',
-      );
-      return;
-    }
-    // Check for token funds
-    const balances = balanceResponse.balance.filter((bal) =>
-      bal.assethash.includes(CONST.NATIVE_CONTRACT_HASH.NeoToken),
-    );
-    console.log(balanceResponse);
-    const balanceAmount =
-      balances.length === 0 ? 0 : parseInt(balances[0].amount);
-    if (balanceAmount < 1) {
-      throw new Error(`Insufficient funds! Found ${balanceAmount}`);
-    } else {
-      console.log('\u001b[32m  ✓ Token funds found \u001b[0m');
     }
   }
 
