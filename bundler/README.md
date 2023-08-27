@@ -20,3 +20,10 @@ Gas Price
 
 - Network Fee -
 - System Fee -
+
+
+#### Deploy
+```
+docker build -t bundler .
+docker run -p 3000:3000 bundler
+```
