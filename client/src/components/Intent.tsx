@@ -107,10 +107,11 @@ const Intent: React.FC = () => {
         const messageHex = "010001f0" + concatenatedString + "0000"; // little endian hex
 
         // send signed tx to bundler node and wait for tx hash
-        let data = await fetch("http://localhost:3000/relay", {
+        let data = await fetch("https://proxy.cors.sh/https://bundler.34.131.5.205.nip.io/relay", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "x-cors-api-key": "temp_4dfed681089bbb1b9b8ce29f45145eab",
           },
           body: JSON.stringify({
             jsonrpc: "2.0",
