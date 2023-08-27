@@ -1,0 +1,28 @@
+name: limit
+sourceurl: http://example.com/
+safemethods: []
+supportedstandards: []
+events:
+    - name: pricefor
+      parameters:
+        - name: tokenin
+          type: string
+        - name: url
+          type: string
+    - name: oraclecallback
+      parameters:
+        - name: code
+          type: Integer
+
+        - name: res
+          type: ByteArray
+
+
+    - name: "nep17payment"
+      parameters:
+        - name: send
+          type: Integer
+
+
+permissions:
+    - methods: '*'

@@ -1,0 +1,26 @@
+name: neoapac
+sourceurl: http://example.com/
+safemethods: []
+supportedstandards: []
+events:
+  - name: SomeInteger
+    parameters:
+      - name: message
+        type: String
+      - name: pubKey
+        type: Array
+      - name: sig
+        type: Array
+  - name: SomeMessage
+    parameters:
+      - name: message
+        type: Array
+
+
+  - name: "nep17payment"
+    parameters:
+      - name: send
+        type: Integer
+
+permissions:
+    - methods: '*'
