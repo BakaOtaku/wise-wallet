@@ -3,9 +3,13 @@ import bodyParser from 'body-parser';
 import cron from 'node-cron';
 import cors from 'cors';
 import { Coin, IncentivizedTestent, NibiruSigningClient, newCoin, newCoins, newSignerFromMnemonic } from "@nibiruchain/nibijs"
-import { Msg, TxMessage } from "@nibiruchain/nibijs/dist/msg"
-import {  } from "@nibiruchain/nibijs"
-import { EncodeObject } from "@cosmjs/proto-signing";
+import { DirectSecp256k1Wallet } from '@cosmjs/proto-signing';
+import { SigningCosmosClient } from '@cosmjs/launchpad';
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+import { Secp256k1HdWallet } from '@cosmjs/amino'
+// import { Msg, TxMessage } from "@nibiruchain/nibijs/dist/msg"
+// import {  } from "@nibiruchain/nibijs"
+// import { EncodeObject } from "@cosmjs/proto-signing";
 
 const app = express();
 const PORT = 3000;
@@ -16,18 +20,18 @@ app.use(bodyParser.json());
 // Enable CORS for all routes
 app.use(cors());
 
-interface UserOp {
-    operation?: string;
-    userId?: string;
-    [key: string]: any; // You can make this more specific depending on the expected properties of UserOp
-}
 
 // Our queue to store UserOp objects
-const userOpQueue: UserOp[] = [];
+const userOpQueue: any[] = [];
+const entrypointContract: string = 'nibi12kc8l3gfncxgu88trwz2gy7myyc5dw3h0m794r8da5e8yd6w5avstpkt4a';
+
+const endpoint = "";
+const mnemonic = "crash give faint speak empower crush decade suspect cage ranch fish angry alcohol ill city";
+
 
 // POST endpoint to add a UserOp to the queue
 app.post('/enqueue', (req: Request, res: Response) => {
-    const userOp: UserOp = req.body;
+    const userOp: any = req.body;
 
     if (!userOp) {
         return res.status(400).json({ error: 'UserOp object is required' });
@@ -46,18 +50,10 @@ app.listen(PORT, () => {
 // Cron job that runs every 5 seconds
 cron.schedule('*/5 * * * * *', async () => {
     console.log('Running the cron job...');
+    const signer = await Secp256k1HdWallet.fromMnemonic(mnemonic);
 
-    const TEST_CHAIN = IncentivizedTestent(1);
-    const signer = await newSignerFromMnemonic('');
-    await signer.getAccounts();
-    const signingClient = await NibiruSigningClient.connectWithSigner(
-        TEST_CHAIN.endptTm,
-        signer,
-    );
-
-    const [{ address: fromAddr }] = await signer.getAccounts();
-    const tokens: Coin[] = newCoins(5, "unibi");
-    const toAddr: string = "..."; // bech32 address of the receiving party
+    const client = await SigningCosmWasmClient.connectWithSigner(endpoint, signer);
+    const [firstAccount] = await signer.getAccounts();
 
     const incrementMsgs = []; // Array to store the EncodeObject from userOpQueue
 
@@ -70,22 +66,19 @@ cron.schedule('*/5 * * * * *', async () => {
         incrementMsgs.push({
             typeUrl: "wasm/MsgExecuteContract",
             value: {
-                sender: userOp.sender || 'myAddress',
-                contract: userOp.contract || 'contractAddress',
-                msg: Buffer.from(JSON.stringify(userOp.msg || { "Increment": {} })).toString("base64"),
-                sent_funds: userOp.sent_funds || [],
+                sender: firstAccount,
+                contract: entrypointContract,
+                msg: Buffer.from(JSON.stringify(userOp.msg)).toString("base64"),
+                sent_funds: [],
             }
         });
     }
-
+    // signingClient.wasmClient.sign
     if (incrementMsgs.length > 0) {
-        const fee = {
-            amount: [{ amount: '5000', denom: 'ucosm' }],  // Define appropriate fees
-            gas: '200000',  // Define appropriate gas limit
-        };
-
         // Assuming 'signAndBroadcast' accepts multiple messages
-        signingClient.wasmClient.signAndBroadcast('', incrementMsgs, fee);
+        // signingClient.wasmClient.signAndBroadcast((await signer.getAccounts())[0].address, incrementMsgs, "auto");
+        const result = await client.execute(firstAccount.address, endpoint, incrementMsgs, "auto");
+
         console.log(`Sent ${incrementMsgs.length} messages to the blockchain.`);
     } else {
         console.log('No messages to send.');
