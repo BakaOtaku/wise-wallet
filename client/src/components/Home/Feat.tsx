@@ -9,7 +9,7 @@ const Why = () => {
       <div className={classes.featCont}>
         <div className={classes.feat}>
           <div className={classes.featTitle}>
-            Modules infrastructure that makes Neo ecosystem more powerful.
+            Modules infrastructure that makes Nibiru ecosystem more powerful.
           </div>
 
           <div className={classes.listCont}>
@@ -19,7 +19,7 @@ const Why = () => {
                 <div>
                   <div className="property-title">Modules.</div>
                   <div className="property-text">
-                    The modular infrastructure makes the Neo ecosystem more
+                    The modular infrastructure makes the Nibiru ecosystem more
                     powerful.
                   </div>
                 </div>
@@ -41,7 +41,7 @@ const Why = () => {
                   <div>
                     <div className="property-title">Passkeys.</div>
                     <div className="property-text" style={{ marginBottom: 25 }}>
-                      Use webauthn to sign transactions. The neo and passkeys
+                      Use webauthn to sign transactions. The Nibiru and passkeys
                       uses secp256r1 curve, it makes the UX revolutionary.
                     </div>
                   </div>

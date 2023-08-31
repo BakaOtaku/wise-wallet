@@ -32,7 +32,7 @@ export const showSuccessMessage = (message: string, txHash?: string) => {
   toast.success(message, {
     onClick: () => {
       window.open(
-        `https://testnet.mintscan.io/osmosis-testnet/txs/${txHash}`,
+        `https://testnet.explorer.injective.network/transaction/${txHash}/event-logs`,
         "_blank"
       );
     },
@@ -43,6 +43,5 @@ export const showSuccessMessage = (message: string, txHash?: string) => {
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
-    style: { cursor: "pointer" },
   });
 };

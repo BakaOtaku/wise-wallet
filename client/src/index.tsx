@@ -1,8 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import "react-toastify/dist/ReactToastify.css";
 import { ThemeProvider } from "@emotion/react";
 import { CssBaseline } from "@mui/material";
+import "react-toastify/dist/ReactToastify.css";
+
+import { SigningCosmWasmProvider } from "@/context/cosmwasm";
 import theme from "./theme";
 import App from "./App";
 
@@ -14,7 +16,9 @@ root.render(
   <React.StrictMode>
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <App />
+      <SigningCosmWasmProvider>
+        <App />
+      </SigningCosmWasmProvider>
     </ThemeProvider>
   </React.StrictMode>
 );

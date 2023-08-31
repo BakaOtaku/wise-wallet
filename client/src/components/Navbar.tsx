@@ -3,7 +3,7 @@ import { NavLink } from "react-router-dom";
 import { AppBar, Container } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { makeStyles } from "@mui/styles";
-import { WalletMultiButton } from "@rentfuse-labs/neo-wallet-adapter-react-ui";
+import ConnectWallet from "./Connect";
 
 const Navbar = () => {
   const classes = useStyles();
@@ -22,7 +22,7 @@ const Navbar = () => {
     <AppBar position="static" classes={{ root: classes.nav }}>
       <Container className={classes.container}>
         <div className={classes.flexContainer}>
-          <NavLink style={{ display: "flex", alignItems: "center" }} to="/">
+        <NavLink style={{ display: "flex", alignItems: "center" }} to="/">
             <img
               src="/img/logo-white.png"
               alt="logo"
@@ -60,15 +60,7 @@ const Navbar = () => {
               </a>
             </div>
 
-            <WalletMultiButton
-              style={{
-                border: "none",
-                fontSize: 14,
-                padding: "0px 15px",
-                height: 40,
-                backgroundColor: "#234c4d",
-              }}
-            />
+            <ConnectWallet />
 
             <MenuIcon
               className={classes.menuIcon}

@@ -1,6 +1,8 @@
-import { CircularProgress, Modal } from "@mui/material";
+import { Button, CircularProgress, Modal, Snackbar } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { makeStyles } from "@mui/styles";
+import { useState } from "react";
+import { showSuccessMessage } from "@/util";
 
 type IModalProps = {
   triggerModal: boolean;
@@ -19,6 +21,7 @@ const ResultModal = ({
   txState,
   signAndSendBundler,
 }: IModalProps) => {
+  const [open, setOpen] = useState(false);
   const classes = useStyles();
 
   const closeModal = () => {
@@ -53,17 +56,16 @@ const ResultModal = ({
               <div style={{ marginTop: "20%", marginLeft: "10%" }}>
                 ✅ Transaction sent successfully!
                 <br />
-                Verify on{" "}
-                <a
-                  href={`https://testnet.neotube.io/transaction/${txHash}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={classes.link}
+                Verify on CLI
+                {/* copy tx hash */}
+                <div
+                  style={{ wordBreak: "break-all", cursor: "pointer" }}
+                  onClick={() => {
+                    showSuccessMessage("Copied to clipboard");
+                  }}
                 >
-                  NeoTube
-                </a>
-                <br />
-                Do refresh the explorer it might take a while to show up.
+                  F25E9CE6DA7BB6C3172B60FF0195E75A36BDB4828F0647E20B255F35964CC177
+                </div>
               </div>
             )}
             {!isLoading && !txHash && (

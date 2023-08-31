@@ -1,22 +1,31 @@
 import React, { useState } from "react";
 import { Button, InputBase } from "@mui/material";
 import { makeStyles } from "@mui/styles";
-import { useWallet } from "@rentfuse-labs/neo-wallet-adapter-react";
+import { cosmwasm } from "osmojs";
 import ResultModal from "./UI/ResultModal";
 import { showErrorMessage } from "@/util";
-import { u, sc } from "@cityofzion/neon-js";
+import { useSigningClient } from "@/context/cosmwasm";
+
+const contractAddr =
+  "nibi1ec5wenydt8pe2ntjfxv6ny97jtc7t4fqnuyl8as3xepjc4udfyfs699j7a";
+const swapAddr =
+  "nibi1ec5wenydt8pe2ntjfxv6ny97jtc7t4fqnuyl8as3xepjc4udfyfs699j7a";
 
 const Intent: React.FC = () => {
   const classes = useStyles();
-  const { address } = useWallet();
+  const { signingClient, walletAddress } = useSigningClient();
 
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [triggerModal, setTriggerModal] = useState(false);
-  const [txState, setTxState] = useState<object>({});
+  const [txState, setTxState] = useState<any>({});
   const [txHash, setTxHash] = useState("");
 
   const handleSubmit = async () => {
+    if (!walletAddress) {
+      showErrorMessage("Please connect your wallet");
+      return;
+    }
     setTriggerModal(true);
     setIsLoading(true);
     setTxHash("");
@@ -24,7 +33,7 @@ const Intent: React.FC = () => {
     try {
       // call to solver to resolve the string with the tx data
       const data = await fetch(
-        "https://proxy.cors.sh/https://solver.34.131.5.205.nip.io/api",
+        "http://localhost:8080/api",
         {
           method: "POST",
           headers: {
@@ -39,7 +48,6 @@ const Intent: React.FC = () => {
       console.log(data);
       const res = await data.json();
       console.log(res);
-
       let parsedArray: any[] = [];
       try {
         const contentString = res.data.detail.text;
@@ -81,53 +89,60 @@ const Intent: React.FC = () => {
       setIsLoading(true);
       setTxHash("");
       setTxState({});
-      const limitContract = "01464f6394107d76978d7614b9a7a01d0cc71e34";
-      if (address) {
-        const ops = sc.ContractParam.array(
-          sc.ContractParam.hash160(address),
-          sc.ContractParam.hash160(limitContract),
-          sc.ContractParam.string(`${"transfer" ? "trigger" : "swap"}`),
-          // callData
-          sc.ContractParam.array(
-            sc.ContractParam.integer(1),
-            sc.ContractParam.any("")
-          ),
-          sc.ContractParam.boolean(false) // gasMode (sponsored)
-        );
-        const uerOpHash = u.hash256(JSON.stringify(ops));
-        console.log(uerOpHash);
-        const neo = new (window as any).NEOLineN3.Init();
-        const sig = await neo.signMessage({
-          message: uerOpHash,
-        });
-        const message = sig.salt + uerOpHash;
-        const parameterHexString = Buffer.from(message).toString("hex");
-        const lengthHex = u.num2VarInt(parameterHexString.length / 2);
-        const concatenatedString = lengthHex + parameterHexString;
-        const messageHex = "010001f0" + concatenatedString + "0000"; // little endian hex
-
-        // send signed tx to bundler node and wait for tx hash
-        let data = await fetch("https://proxy.cors.sh/https://bundler.34.131.5.205.nip.io/relay", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "x-cors-api-key": "temp_4dfed681089bbb1b9b8ce29f45145eab",
-          },
-          body: JSON.stringify({
-            jsonrpc: "2.0",
-            method: "sendrawtransaction",
-            signature: messageHex,
-            id: 1,
-          }),
-        });
-        console.log(data);
-        const res = await data.json();
-        console.log(res.txid);
-        setTxHash(res.txid);
-      } else {
+      if (!signingClient) {
         showErrorMessage("Please connect your wallet");
-        setIsLoading(false);
+        return;
       }
+
+      const { executeContract } = cosmwasm.wasm.v1.MessageComposer.withTypeUrl;
+      const msg = executeContract({
+        sender: walletAddress,
+        contract: contractAddr,
+        msg: Buffer.from(
+          JSON.stringify({
+            limit: {
+              token_in: txState?.token_in,
+              token_out: txState?.token_out,
+              quantity: txState?.quantity,
+              time: txState?.time,
+            },
+          })
+        ),
+        funds: [
+          {
+            denom: "unibi",
+            amount: "0",
+          },
+        ],
+      });
+
+      const tx = await signingClient.sign(
+        walletAddress,
+        [msg],
+        {
+          gas: "5000000",
+          amount: [
+            {
+              amount: "0",
+              denom: "uosmo",
+            },
+          ],
+        },
+        ""
+      );
+      console.log(tx);
+      // let sigHex = Buffer.from(tx?.signatures[0]).toString("hex");
+      const userOp = {
+        Sender: walletAddress,
+        To: swapAddr,
+        Nonce: 0,
+        Calldata: msg.value.msg,
+        Signature: tx.signatures[0],
+      }
+
+      console.log(userOp);
+
+      setTxHash("abc");
     } catch (error: any) {
       console.log(error);
       setIsLoading(false);
@@ -149,7 +164,7 @@ const Intent: React.FC = () => {
         className={classes.input}
         value={inputValue}
         onChange={(e) => setInputValue(e.target.value)}
-        placeholder="Swap 1 NEO for best rate available..."
+        placeholder="Swap for best rate available..."
         sx={{ width: "100%", borderRadius: 50, paddingLeft: 2 }}
       />
       <Button
