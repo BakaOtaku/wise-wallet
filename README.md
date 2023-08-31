@@ -3,11 +3,13 @@
 <h6 align="center">GPT solver, Limit hooks and much more</h6>
 
 - [Presentation File 🗎 🔗](https://github.com/BakaOtaku/wise-wallet/blob/main/WiseWallet.pdf)
-- [Presentation Video 🔗](https://www.youtube.com/watch?v=NkNnJ4hX1eE&feature=youtu.be)
+- [Presentation Video 📹 🔗](https://www.youtube.com/watch?v=NkNnJ4hX1eE&feature=youtu.be)
+- - [Documentation 🔗](https://arpitsrivastava2012.gitbook.io/wisewallet/)
+
 - Deployed Contract
     ```
     entrypoint: nibi1436kxs0w2es6xlqpp9rd35e3d0cjnw4sv8j3a7483sgks29jqwgsn6ytm8
-    
+
     limit: nibi1mf6ptkssddfmxvhdx0ech0k03ktp6kf9yk59renau2gvht3nq2gqfdzd2w
     ```
 
