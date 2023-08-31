@@ -1,11 +1,10 @@
 use cosmwasm_schema::write_api;
 
-use wise_wallet::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use entrypoint::msg::{ExecuteMsg, InstantiateMsg};
 
 fn main() {
     write_api! {
         instantiate: InstantiateMsg,
         execute: ExecuteMsg,
-        query: QueryMsg,
     }
 }
