@@ -1,0 +1,31 @@
+{
+  "name": "relayer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@cosmjs/amino": "^0.31.1",
+    "@cosmjs/cosmwasm-stargate": "^0.31.1",
+    "@cosmjs/launchpad": "^0.27.1",
+    "@cosmjs/proto-signing": "^0.31.1",
+    "@cosmjs/stargate": "^0.31.1",
+    "@nibiruchain/nibijs": "^0.21.17",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "node-cron": "^3.0.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/node": "^20.5.7",
+    "@types/node-cron": "^3.0.8",
+    "typescript": "^5.2.2"
+  }
+}

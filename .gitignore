@@ -17,3 +17,4 @@ script.sh
 # IDEs
 *.iml
 .idea
+node_modules
