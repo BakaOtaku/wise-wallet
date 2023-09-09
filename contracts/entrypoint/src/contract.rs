@@ -62,7 +62,7 @@ pub mod execute {
             let mut msg: CosmosMsg<_> = CosmosMsg::Wasm(cosmwasm_std::WasmMsg::Execute {
                 contract_addr: op.To.into_string(),
                 msg: op.Calldata,
-                funds: vec![],
+                funds: op.funds,
             });
 
             let bin_msg = to_binary(&msg)?;

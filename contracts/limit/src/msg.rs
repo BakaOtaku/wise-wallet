@@ -1,30 +1,71 @@
 use crate::state::SwapOrder;
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, CustomQuery, Decimal, QuerierWrapper, StdResult, Uint64};
+use cosmwasm_std::{Addr, CustomQuery, Decimal, QuerierWrapper, StdResult, Uint64, Uint128, CustomMsg, CosmosMsg, Coin};
 use std::collections::HashMap;
 
 #[cw_serde]
 pub struct InstantiateMsg {}
+
+
+#[cw_serde]
+pub enum NibiruRoute {
+    /// "perp" is the route corresponding to bindings for the x/perp module.
+    Perp,
+    Oracle,
+    Spot,
+
+    /// "no_op" is a valid route that doesn't do anything. It's necessary for
+    /// formatting in the custom Wasm execute handler.
+    NoOp,
+}
+
+#[cw_serde]
+pub struct ContractExecMsg {
+    pub route: NibiruRoute,
+    pub msg: Option<ExecuteMsg>,
+}
+
+impl CustomMsg for ContractExecMsg{}
+
+impl  From<ContractExecMsg> for CustomMsg<ContractExecMsg>{
+    fn from(msg: ContractExecMsg) -> Self {
+        CosmosMsg::Custom(msg)
+    }
+}
 
 #[cw_serde]
 pub enum ExecuteMsg {
     StoreSwapOrder {
         to: String,
         order_requester: Addr,
-        token_sell: Addr,
-        token_bought: Addr,
-        quantity_order: u128,
-        swap_upper_usd: u128,
-        swap_lower_usd: u128,
-        minimum_result_accepted_usd: u128,
-        max_in_sell_usd: u128,
+        token_sell: String,
+        token_bought: String,
+        quantity_order: Uint128,
+        swap_upper_usd: Uint128,
+        swap_lower_usd: Uint128,
+        minimum_result_accepted_usd: Uint128,
+        max_in_sell_usd: Uint128,
         is_token_out_order: bool,
+        pair_id:Option<Uint64>
     },
 
     ExecuteSwapOrder {
         order_id: Uint64,
     },
+
+    ExecuteSwapOrderIntenal{
+        order_id:Uint64
+    },
+
+    SwapAssets {
+        pool_id: Uint64,
+        token_in: Coin,  
+        token_out_denom:String
+    },
 }
+
+
+
 
 #[cw_serde]
 #[derive(QueryResponses)]
@@ -32,6 +73,9 @@ pub enum QueryMsg {
     // GetCount returns the current count as a json-encoded number
     #[returns(GetOrderResponse)]
     GetOrder { orderId: u64 },
+
+    #[returns(OraclePricesResponse)]
+    GetExchangeRate{pair:String}
 }
 
 #[cw_serde]

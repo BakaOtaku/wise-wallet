@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, Binary, Uint128, Uint64};
+use cosmwasm_std::{Addr, Binary, Uint128, Uint64, Coin};
 
 #[cw_serde]
 pub struct InstantiateMsg {}
@@ -16,5 +16,6 @@ pub struct UserOp {
     pub Nonce: Uint128,
     pub Calldata: Binary,
     pub Signature: Option<Binary>,
+    pub funds : Vec<Coin>,
     pub Pubkey: Binary,
 }

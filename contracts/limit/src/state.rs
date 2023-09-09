@@ -1,7 +1,7 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use cosmwasm_std::Addr;
+use cosmwasm_std::{Addr, Uint64};
 use cw_storage_plus::{Item, Map};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
@@ -16,6 +16,7 @@ pub struct SwapOrder {
     pub minimum_result_accepted_usd: u128,
     pub max_in_sell_usd: u128,
     pub is_token_out_order: bool,
+    pub pair_id: Option<Uint64>
 }
 
 pub const ORDER_ID_COUNTER: Item<u64> = Item::new("ORDER_ID_COUNTER");
