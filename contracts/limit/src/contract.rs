@@ -7,7 +7,7 @@ use cosmwasm_std::{
 use cw2::set_contract_version;
 use cw20::Cw20ExecuteMsg::Transfer;
 
-use self::execute::execute_order;
+use self::execute::{execute_order, execute_internal_swap};
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, NibiruQuerier, QueryMsg, QueryperpMsg};
 use crate::state::ORDER_ID_COUNTER;
@@ -70,6 +70,7 @@ pub fn execute(
         ),
 
         ExecuteMsg::ExecuteSwapOrder { order_id } => execute_order(deps, order_id.u64()),
+        ExecuteMsg::ExecuteSwapOrderIntenal { order_id } => execute_internal_swap(deps, order_id.u64()),
     }
 }
 
