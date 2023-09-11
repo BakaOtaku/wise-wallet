@@ -23,7 +23,7 @@ app.use(cors());
 
 // Our queue to store UserOp objects
 const userOpQueue: any[] = [];
-const entrypointContract: string = 'nibi1436kxs0w2es6xlqpp9rd35e3d0cjnw4sv8j3a7483sgks29jqwgsn6ytm8';
+const entrypointContract: string = 'nibi1mf6ptkssddfmxvhdx0ech0k03ktp6kf9yk59renau2gvht3nq2gqfdzd2w';
 
 const endpoint = "https://rpc.itn-2.nibiru.fi:443";
 const mnemonic = "";
