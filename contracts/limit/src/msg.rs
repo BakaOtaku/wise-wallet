@@ -1,11 +1,13 @@
 use crate::state::SwapOrder;
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, CustomQuery, Decimal, QuerierWrapper, StdResult, Uint64, Uint128, CustomMsg, CosmosMsg, Coin};
+use cosmwasm_std::{
+    Addr, Coin, CosmosMsg, CustomMsg, CustomQuery, Decimal, QuerierWrapper, StdResult, Uint128,
+    Uint64,
+};
 use std::collections::HashMap;
 
 #[cw_serde]
 pub struct InstantiateMsg {}
-
 
 #[cw_serde]
 pub enum NibiruRoute {
@@ -25,9 +27,9 @@ pub struct ContractExecMsg {
     pub msg: Option<ExecuteMsg>,
 }
 
-impl CustomMsg for ContractExecMsg{}
+impl CustomMsg for ContractExecMsg {}
 
-impl  From<ContractExecMsg> for CustomMsg<ContractExecMsg>{
+impl From<ContractExecMsg> for CustomMsg<ContractExecMsg> {
     fn from(msg: ContractExecMsg) -> Self {
         CosmosMsg::Custom(msg)
     }
@@ -46,26 +48,23 @@ pub enum ExecuteMsg {
         minimum_result_accepted_usd: Uint128,
         max_in_sell_usd: Uint128,
         is_token_out_order: bool,
-        pair_id:Option<Uint64>
+        pair_id: Option<Uint64>,
     },
 
     ExecuteSwapOrder {
         order_id: Uint64,
     },
 
-    ExecuteSwapOrderIntenal{
-        order_id:Uint64
+    ExecuteSwapOrderIntenal {
+        order_id: Uint64,
     },
 
     SwapAssets {
         pool_id: Uint64,
-        token_in: Coin,  
-        token_out_denom:String
+        token_in: Coin,
+        token_out_denom: String,
     },
 }
-
-
-
 
 #[cw_serde]
 #[derive(QueryResponses)]
@@ -75,7 +74,7 @@ pub enum QueryMsg {
     GetOrder { orderId: u64 },
 
     #[returns(OraclePricesResponse)]
-    GetExchangeRate{pair:String}
+    GetExchangeRate { pair: String },
 }
 
 #[cw_serde]
