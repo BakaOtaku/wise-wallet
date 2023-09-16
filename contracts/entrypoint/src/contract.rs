@@ -1,13 +1,16 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint64,
+    from_binary, to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint64,
 };
 use cw2::set_contract_version;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, UserOp};
-use crate::state::USER_NONCE;
+use crate::msg::{ExecuteMsg, InstantiateMsg};
+use crate::state::FACTORY;
+use factory::msg::ExecuteMsg::DeployScw;
+use scw::msg::ExecuteMsg::ExecuteUserOp;
+use scw::msg::UserOp;
 use sha2::{Digest, Sha256};
 
 // version info for migration info
@@ -22,6 +25,7 @@ pub fn instantiate(
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+    FACTORY.save(deps.storage, &msg.factory)?;
     Ok(Response::new()
         .add_attribute("method", "instantiate")
         .add_attribute("owner", info.sender))
@@ -30,56 +34,70 @@ pub fn instantiate(
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::HandleUserOps { UserOps } => execute::handle_user_op(deps, UserOps),
+        ExecuteMsg::HandleUserOps { UserOps } => execute::handle_user_op(deps, env, UserOps),
+        ExecuteMsg::DepositFunds {} => {
+            // let funds = info.funds;
+            let sender = info.sender;
+            // let mut exisiting = BALANCE.may_load(store, &sender)?.unwrap_or_default();
+            // BALANCE.save(store, &sender, &exisiting.checked_add(&funds)?)?;
+            Ok(Response::new().add_attribute("sender", sender.to_string()))
+        }
     }
 }
 
 pub mod execute {
     use std::vec;
 
-    use cosmwasm_std::CosmosMsg;
+    use cosmwasm_std::{Addr, CosmosMsg, Uint256};
+
+    use crate::msg::QueryMsg;
 
     use super::*;
-    pub fn handle_user_op(deps: DepsMut, ops: Vec<UserOp>) -> Result<Response, ContractError> {
+    pub fn handle_user_op(
+        deps: DepsMut,
+        env: Env,
+        ops: Vec<UserOp>,
+    ) -> Result<Response, ContractError> {
         let mut msgs: Vec<CosmosMsg> = Vec::new();
 
         for op in ops {
-            // check for signature and nonce
-            let usernonce = USER_NONCE
-                .load(deps.storage, op.Sender.clone())
-                .unwrap_or_default();
-            if usernonce + 1 != op.Nonce.u128() {
-                return Err(ContractError::InvalidNonce {
-                    user: op.Sender.to_string(),
+            if op.initcode.is_some() {
+                let initcode = op.initcode.unwrap();
+                //TODO: might have to take admin from initcode binary maybe
+
+                // call factory to deploy new contract
+                let factory = FACTORY.load(deps.storage)?;
+                let msg: CosmosMsg<_> = CosmosMsg::Wasm(cosmwasm_std::WasmMsg::Execute {
+                    contract_addr: factory.to_string(),
+                    msg: to_binary(&DeployScw { admin: op.sender })?,
+                    funds: vec![],
                 });
+
+                return Ok(Response::new().add_message(msg));
             }
+
+            //TODO: calculate scw address and send to there
+            let scw_address: Addr = deps.querier.query_wasm_smart(
+                FACTORY.load(deps.as_ref().storage)?,
+                &to_binary(&QueryMsg::Address {
+                    owner: op.sender.clone(),
+                })?,
+            )?;
 
             let mut msg: CosmosMsg<_> = CosmosMsg::Wasm(cosmwasm_std::WasmMsg::Execute {
-                contract_addr: op.To.into_string(),
-                msg: op.Calldata,
-                funds: op.funds,
+                contract_addr: scw_address.to_string(),
+                msg: to_binary(&ExecuteUserOp { user_op: op })?,
+                funds: vec![],
             });
-
-            let bin_msg = to_binary(&msg)?;
-            let hash = sha256(&bin_msg);
-            let sig = op.Signature.unwrap();
-
-            if !deps
-                .api
-                .secp256k1_verify(&hash, &sig, &op.Pubkey)
-                .unwrap_or_default()
-            {
-                return Err(ContractError::Unauthorized {});
-            }
 
             msgs.push(msg);
         }
-        Ok(Response::new())
+        Ok(Response::new().add_messages(msgs))
     }
 }
 

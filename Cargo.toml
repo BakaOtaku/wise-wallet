@@ -1,6 +1,8 @@
 [workspace]
 members = [
-  "contracts/limit",
+  "contracts/factory",
+  # "contracts/limit",
+  "contracts/scw",
   "contracts/entrypoint"
 ]
 
@@ -25,8 +27,17 @@ cw2 = "1.0.1"
 cw-utils = "1.0.1"
 anyhow = "1.0.70"
 thiserror = "1.0.40"
+schemars = "0.8.10"
 serde = { version = "1.0.103", default-features = false, features = ["derive"] }
 semver = "1"
+factory = { version = "0.1.0", path = "./contracts/factory", features = [
+  "library",
+] }
+
+scw = { version = "0.1.0", path = "./contracts/scw", features = [
+  "library",
+] }
+
 
 [profile.release]
 codegen-units = 1
