@@ -18,3 +18,4 @@ script.sh
 *.iml
 .idea
 node_modules
+deploy.sh

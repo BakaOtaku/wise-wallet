@@ -7,9 +7,9 @@ use cosmwasm_std::{
 use cw2::set_contract_version;
 use cw20::Cw20ExecuteMsg::Transfer;
 
-use self::execute::{execute_order, execute_internal_swap};
+use self::execute::execute_order;
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, NibiruQuerier, QueryMsg, QueryperpMsg};
+use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::ORDER_ID_COUNTER;
 use anybuf::Anybuf;
 use base64::decode;
@@ -35,7 +35,7 @@ pub fn instantiate(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
-    deps: DepsMut<QueryperpMsg>,
+    deps: DepsMut,
     _env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
@@ -70,7 +70,6 @@ pub fn execute(
         ),
 
         ExecuteMsg::ExecuteSwapOrder { order_id } => execute_order(deps, order_id.u64()),
-        ExecuteMsg::ExecuteSwapOrderIntenal { order_id } => execute_internal_swap(deps, order_id.u64()),
     }
 }
 
@@ -82,13 +81,11 @@ pub mod execute {
     use serde::de;
 
     use super::*;
-    use crate::{
-        msg::{OraclePricesResponse, QueryperpMsg, ContractExecMsg, NibiruRoute},
-        state::{SwapOrder, ORDER_ID_COUNTER, SWAP_ORDER_STORE},
-    };
+    use crate::state::{SwapOrder, ORDER_ID_COUNTER, SWAP_ORDER_STORE};
+    
 
     pub fn store_swap_order(
-        deps: DepsMut<QueryperpMsg>,
+        deps: DepsMut,
         info: MessageInfo,
         to: String,
         order_requester: String,
@@ -125,73 +122,33 @@ pub mod execute {
     }
 
     pub fn execute_order(
-        deps: DepsMut<QueryperpMsg>,
+        deps: DepsMut,
         order_id: u64,
     ) -> Result<Response, ContractError> {
         let mut swap_order = SWAP_ORDER_STORE.load(deps.storage, order_id)?;
         let mut pair = swap_order.token_sell.clone();
-        pair.push_str(":");
-        pair.push_str(&swap_order.token_bought.clone());
-        let querier = NibiruQuerier::new(&deps.querier);
-        let price_map: OraclePricesResponse = querier.oracle_prices(Some(vec![pair.clone()]))?;
-        let decimaldefault = Decimal::zero();
-        let price = price_map.get(&pair).unwrap_or(&decimaldefault);
-        let swap_lower = Decimal::new(swap_order.swap_lower_usd.into());
-        let swap_upper = Decimal::new(swap_order.swap_upper_usd.into());
-        let mut msg: CosmosMsg;
-        if price.le(&swap_lower) {
-            let sell = Coin::new(swap_order.quantity_order.into(), swap_order.token_sell.clone());
-            let msg = CosmosMsg::Bank(
-                cosmwasm_std::BankMsg::Send { to_address: swap_order.to, amount: vec![sell] },
-            );
-        } else {
-            let sell = Coin::new(swap_order.quantity_order.into(), swap_order.token_bought.clone());
-            msg = CosmosMsg::Bank(
-                cosmwasm_std::BankMsg::Send { to_address: swap_order.to, amount: vec![sell] },
-            )
-        }
+  
 
-        Ok(Response::new().add_message(msg))
-    }
-
-
-    pub fn execute_internal_swap(deps:DepsMut<QueryperpMsg>, order_id:u64) -> Result<Response,ContractError> {
-        let mut swap_order = SWAP_ORDER_STORE.load(deps.storage, order_id)?;
-        let mut pair_id= swap_order.pair_id.unwrap();
-
-        let msg= ContractExecMsg{
-            route:NibiruRoute::Perp,
-            msg:ExecuteMsg::SwapAssets { pool_id: pair_id , token_in: swap_order.token_bought, token_out_denom: swap_order.token_sell}.into(),
-        };
+        Ok(Response::default())
     }
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
-pub fn query(deps: Deps<QueryperpMsg>, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetOrder { orderId } => to_binary(&query::get_order(deps, orderId)?),
-        QueryMsg::GetExchangeRate { pair } => to_binary(&query::get_exchange_rate(deps, pair)?),
     }
 }
 
 pub mod query {
     use super::*;
     use crate::msg::GetOrderResponse;
-    use crate::msg::OraclePricesResponse;
     use crate::state::{SwapOrder, SWAP_ORDER_STORE};
 
-    pub fn get_order(deps: Deps<QueryperpMsg>, orderId: u64) -> StdResult<GetOrderResponse> {
+    pub fn get_order(deps: Deps, orderId: u64) -> StdResult<GetOrderResponse> {
         let state = SWAP_ORDER_STORE.load(deps.storage, orderId)?;
 
         Ok(GetOrderResponse { order: state })
-    }
-
-
-    pub fn get_exchange_rate(deps: Deps<QueryperpMsg>, pair: String) -> StdResult<OraclePricesResponse> {
-        let querier = NibiruQuerier::new(&deps.querier);
-        let price_map: OraclePricesResponse = querier.oracle_prices(Some(vec![pair.clone()]))?;
-
-        Ok(price_map)
     }
 }
 
