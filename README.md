@@ -3,18 +3,18 @@
 <h6 align="center">GPT solver, Limit hooks and much more</h6>
 
 - [Presentation File 🗎 🔗](https://github.com/BakaOtaku/wise-wallet/blob/main/WiseWallet.pdf)
-- [Presentation Video 📹 🔗](https://www.youtube.com/watch?v=NkNnJ4hX1eE&feature=youtu.be)
+- [Presentation Video 📹 🔗](https://www.youtube.com/watch?v=PTgNPGU0oII&ab_channel=AmanRaj)
 - - [Documentation 🔗](https://arpitsrivastava2012.gitbook.io/wisewallet/)
 
 - Deployed Contract
     ```
-    entrypoint: nibi1436kxs0w2es6xlqpp9rd35e3d0cjnw4sv8j3a7483sgks29jqwgsn6ytm8
+    entrypoint: comdex1gzyj8lgwuyxv4kgwm74hmtpyp9rm4slywj9zc93y4z32gv83taeq4eulld
 
-    limit: nibi1mf6ptkssddfmxvhdx0ech0k03ktp6kf9yk59renau2gvht3nq2gqfdzd2w
+    limit: comdex1ycvzczy0hz0z69k5tzmxmhdnmuq8dtwlczm0snzlyutnqvq6s9ps07vnys
     ```
 
 ## Abstract
-WiseWallet seeks to redefine the way users interact with decentralized applications and execute transactions on the nibiru blockchain. Through the utilization of account abstraction, off-chain signing, bundlers, and our unique "Limit Hooks" feature, WiseWallet aims to provide an unmatched user experience that is both secure and efficient.
+WiseWallet seeks to redefine the way users interact with decentralized applications and execute transactions on the comdex blockchain. Through the utilization of account abstraction, off-chain signing, bundlers, and our unique "Limit Hooks" feature, WiseWallet aims to provide an unmatched user experience that is both secure and efficient.
 
 ## 1. Introduction
 With the rapid growth of the decentralized finance (DeFi) ecosystem, users demand greater flexibility, user-friendliness, and efficiency in their transactions. WiseWallet's innovative solutions answer this demand by offering a set of features not found together in any existing platform.
@@ -32,11 +32,11 @@ Account Abstraction seeks to blur this distinction, creating a scenario where us
   - Reduction in on-chain congestion as transactions don't need to be broadcasted immediately.
   - Enhanced privacy as off-chain data isn't immediately visible on the blockchain.
   - Immediate user feedback without waiting for blockchain confirmations.
-  
+
 - **b) Paymaster**: A designated entity within the WiseWallet ecosystem, the Paymaster manages:
   - Covering transaction gas fees, simplifying the user experience by eliminating the need for manual gas fee handling.
   - Refunding gas fees, if necessary, according to the platform's protocols.
-  
+
 - **c) Staking for Fees**: A user-friendly approach to transaction costs:
   - Users deposit a certain amount in their WiseWallet, designated for fees.
   - As transactions occur, their associated fees are automatically deducted from this staked amount.
@@ -58,8 +58,8 @@ One of WiseWallet's most innovative features, Limit Hooks enable users to set bo
 A user sets a desired limit for a transaction (buy/sell/swaps). The request remains dormant until the specified conditions are met. Once the criteria are achieved, the Solver API triggers and executes the transaction, charging a nominal commission for the service.
 
 ### 4.2 Use Cases
-- **Price-based Transactions**: A user wants to buy Nibiru with all his nUSD when the Nibiru price drops to a certain level within a specified timeframe. With WiseWallet's Limit Hooks, the user can set this condition and continue his daily tasks without locking his tokens or continuously monitoring the market.
-- **Depreciation Protection**: Users can shield themselves from token depreciation, e.g., if a stablecoin like XUSD falls below $0.98, the system can be set to automatically swap all XUSD to Nibiru, thus preserving the user's value.
+- **Price-based Transactions**: A user wants to buy Comdex with all his nUSD when the Comdex price drops to a certain level within a specified timeframe. With WiseWallet's Limit Hooks, the user can set this condition and continue his daily tasks without locking his tokens or continuously monitoring the market.
+- **Depreciation Protection**: Users can shield themselves from token depreciation, e.g., if a stablecoin like XUSD falls below $0.98, the system can be set to automatically swap all XUSD to Comdex, thus preserving the user's value.
 
 ## 5. Benefits
 - **User-Friendly**: Off-chain signing and Limit Hooks make the platform simple to use, even for those new to the crypto space.
@@ -71,10 +71,10 @@ A user sets a desired limit for a transaction (buy/sell/swaps). The request rema
 WiseWallet's innovative approach to blockchain interactions is set to revolutionize how users perceive and utilize DeFi platforms. Through the combination of user-friendly features and forward-thinking solutions, WiseWallet presents a compelling platform for the future of blockchain-based transactions.
 
 ### Tech Stack
-- Nibiru Oracle
+- Comdex Oracle
 - GPT-4
 - Cosmwasm
-- Nibiru Chain
+- Comdex Chain
 - Rust and TS
 
 ### Team
