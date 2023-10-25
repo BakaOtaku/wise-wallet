@@ -79,7 +79,7 @@ pub mod execute {
 
             msgs.push(msg);
         }
-        Ok(Response::new())
+        Ok(Response::new().add_messages(msgs))
     }
 }
 

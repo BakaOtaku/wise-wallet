@@ -76,7 +76,8 @@ pub fn execute(
 pub mod execute {
     use std::{default, io::Stderr};
 
-    use cosmwasm_std::{CosmosMsg, CustomMsg, WasmMsg, Coin, Uint128};
+    use cosmwasm_std::{CosmosMsg, CustomMsg, WasmMsg, Coin, Uint128, Coins};
+    use cw20::Cw20ExecuteMsg;
     use prost::Message;
     use serde::de;
 
@@ -125,11 +126,30 @@ pub mod execute {
         deps: DepsMut,
         order_id: u64,
     ) -> Result<Response, ContractError> {
-        let mut swap_order = SWAP_ORDER_STORE.load(deps.storage, order_id)?;
+        let mut swap_order:SwapOrder = SWAP_ORDER_STORE.load(deps.storage, order_id)?;
         let mut pair = swap_order.token_sell.clone();
-  
+        
+        // perform oracle call, assume 1-1 
+        // bank transfer 
 
-        Ok(Response::default())
+        let mut msg: CosmosMsg;
+        if swap_order.token_bought.eq("ucmdx"){
+            msg = CosmosMsg::Bank(
+                cosmwasm_std::BankMsg::Send { to_address: swap_order.to, amount: vec![Coin::new(swap_order.quantity_order, swap_order.token_bought)] }
+            )
+        }
+        else {
+        msg = CosmosMsg::Wasm(WasmMsg::Execute {
+            contract_addr: swap_order.token_bought,
+            msg: to_binary(&Cw20ExecuteMsg::Transfer {
+                recipient: swap_order.to,
+                amount: Uint128::from(swap_order.quantity_order)
+            })?,
+            funds: vec![],
+        });
+    }
+
+        Ok(Response::new().add_message(msg))
     }
 }
 
