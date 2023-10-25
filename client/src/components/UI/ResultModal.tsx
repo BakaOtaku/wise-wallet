@@ -56,16 +56,21 @@ const ResultModal = ({
               <div style={{ marginTop: "20%", marginLeft: "10%" }}>
                 ✅ Transaction sent successfully!
                 <br />
-                Verify on CLI
-                {/* copy tx hash */}
-                <div
+                <a
                   style={{ wordBreak: "break-all", cursor: "pointer" }}
-                  onClick={() => {
-                    showSuccessMessage("Copied to clipboard");
-                  }}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`https://nova-explorer.comdex.one/comdex-novanet/tx/${txHash}`}
                 >
-                  F25E9CE6DA7BB6C3172B60FF0195E75A36BDB4828F0647E20B255F35964CC177
-                </div>
+                  <code
+                    style={{
+                      marginLeft: "10px",
+                      color: "blue",
+                    }}
+                  >
+                    Explorer - {txHash}
+                  </code>
+                </a>
               </div>
             )}
             {!isLoading && !txHash && (

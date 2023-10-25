@@ -11,8 +11,8 @@ export interface ISigningCosmWasmClientContext {
   disconnect: Function;
 }
 
-const PUBLIC_RPC_ENDPOINT = "https://nibiru-testnet.rpc.kjnodes.com:443";
-const PUBLIC_CHAIN_ID = "nibiru-itn-1";
+const PUBLIC_RPC_ENDPOINT = "https://rpc-nova.comdex.one:443";
+const PUBLIC_CHAIN_ID = "comdex-novanet";
 // const GAS_PRICE = "0.001";
 
 export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {

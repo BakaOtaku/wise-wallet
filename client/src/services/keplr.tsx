@@ -8,11 +8,11 @@ interface CosmosKeplrWindow extends Window {
 
 declare let window: CosmosKeplrWindow;
 
-const REACT_APP_CHAIN_ID = "nibiru-itn-1";
-const REACT_APP_CHAIN_NAME = "nibi";
-const REACT_APP_CHAIN_RPC_ENDPOINT = "https://nibiru-testnet.rpc.kjnodes.com:443";
-const REACT_APP_CHAIN_REST_ENDPOINT = "https://nibiru-testnet.api.kjnodes.com:443";
-const REACT_APP_CHAIN_BECH32_PREFIX = "nibi";
+const REACT_APP_CHAIN_ID = "comdex-novanet";
+const REACT_APP_CHAIN_NAME = "comdex";
+const REACT_APP_CHAIN_RPC_ENDPOINT = "https://rpc-nova.comdex.one:443";
+const REACT_APP_CHAIN_REST_ENDPOINT = "https://rest-nova.comdex.one";
+const REACT_APP_CHAIN_BECH32_PREFIX = "comdex";
 
 export const connectKeplr = async () => {
   // Keplr extension injects the offline signer that is compatible with cosmJS.
@@ -23,7 +23,7 @@ export const connectKeplr = async () => {
     alert("Please install keplr extension");
   } else {
     if (window.keplr.experimentalSuggestChain) {
-      const stakingDenom = convertFromMicroDenom("unibi");
+      const stakingDenom = convertFromMicroDenom("ucmdx");
 
       try {
         // Keplr v0.6.4 introduces an experimental feature that supports the feature to suggests the chain from a webpage.
@@ -46,7 +46,7 @@ export const connectKeplr = async () => {
             // Coin denomination to be displayed to the user.
             coinDenom: stakingDenom,
             // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-            coinMinimalDenom: "unibi",
+            coinMinimalDenom: "ucmdx",
             // # of decimal points to convert minimal denomination to user-facing denomination.
             coinDecimals: 6,
             // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -77,7 +77,7 @@ export const connectKeplr = async () => {
               // Coin denomination to be displayed to the user.
               coinDenom: stakingDenom,
               // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-              coinMinimalDenom: "unibi",
+              coinMinimalDenom: "ucmdx",
               // # of decimal points to convert minimal denomination to user-facing denomination.
               coinDecimals: 6,
               // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.
@@ -91,7 +91,7 @@ export const connectKeplr = async () => {
               // Coin denomination to be displayed to the user.
               coinDenom: stakingDenom,
               // Actual denom (i.e. uatom, uscrt) used by the blockchain.
-              coinMinimalDenom: "unibi",
+              coinMinimalDenom: "ucmdx",
               // # of decimal points to convert minimal denomination to user-facing denomination.
               coinDecimals: 6,
               // (Optional) Keplr can show the fiat value of the coin if a coingecko id is provided.

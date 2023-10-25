@@ -7,9 +7,9 @@ import { showErrorMessage } from "@/util";
 import { useSigningClient } from "@/context/cosmwasm";
 
 const contractAddr =
-  "nibi1ec5wenydt8pe2ntjfxv6ny97jtc7t4fqnuyl8as3xepjc4udfyfs699j7a";
+  "comdex1dr9ztzlwpeqmq5h9c4fapdzftgk5x44nx63t0fhn9fv3v9kjcw3qclf2qk";
 const swapAddr =
-  "nibi1ec5wenydt8pe2ntjfxv6ny97jtc7t4fqnuyl8as3xepjc4udfyfs699j7a";
+  "comdex1tnfwzm9xucghaxg9fsuwkk8skhwmkx5njr3ndyahtrvtu4e824sqlaryf3";
 
 const Intent: React.FC = () => {
   const classes = useStyles();
@@ -32,19 +32,16 @@ const Intent: React.FC = () => {
     setTxState({});
     try {
       // call to solver to resolve the string with the tx data
-      const data = await fetch(
-        "http://localhost:8080/api",
-        {
-          method: "POST",
-          headers: {
-            "x-cors-api-key": "temp_4dfed681089bbb1b9b8ce29f45145eab",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            inputStr: inputValue,
-          }),
-        }
-      );
+      const data = await fetch("http://localhost:8080/api", {
+        method: "POST",
+        headers: {
+          "x-cors-api-key": "temp_4dfed681089bbb1b9b8ce29f45145eab",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          inputStr: inputValue,
+        }),
+      });
       console.log(data);
       const res = await data.json();
       console.log(res);
@@ -110,11 +107,12 @@ const Intent: React.FC = () => {
         ),
         funds: [
           {
-            denom: "unibi",
+            denom: "ucmdx",
             amount: "0",
           },
         ],
       });
+      console.log(msg);
 
       const tx = await signingClient.sign(
         walletAddress,
@@ -124,7 +122,7 @@ const Intent: React.FC = () => {
           amount: [
             {
               amount: "0",
-              denom: "uosmo",
+              denom: "ucmdx",
             },
           ],
         },
@@ -138,11 +136,31 @@ const Intent: React.FC = () => {
         Nonce: 0,
         Calldata: msg.value.msg,
         Signature: tx.signatures[0],
-      }
-
+      };
       console.log(userOp);
 
-      setTxHash("abc");
+      await fetch("http://localhost:3000/enqueue", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-cors-api-key": "temp_4dfed681089bbb1b9b8ce29f45145eab",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "sendrawtransaction",
+          userOp: userOp,
+          id: 1,
+        }),
+      });
+
+      // promies await to wait for the tx to be mined
+      await new Promise((r) => setTimeout(r, 15000));
+
+      const res = await fetch("http://localhost:3000/txHash");
+      const resJson = await res.json();
+      console.log(resJson);
+
+      setTxHash(resJson.txHash);
     } catch (error: any) {
       console.log(error);
       setIsLoading(false);

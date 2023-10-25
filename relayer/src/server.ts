@@ -1,96 +1,171 @@
-import express, { Request, Response } from 'express';
-import bodyParser from 'body-parser';
-import cron from 'node-cron';
-import cors from 'cors';
-import { Coin, IncentivizedTestent, NibiruSigningClient, newCoin, newCoins, newSignerFromMnemonic } from "@nibiruchain/nibijs"
-import { DirectSecp256k1HdWallet } from '@cosmjs/proto-signing';
-import { SigningCosmosClient } from '@cosmjs/launchpad';
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate';
-// import { S} from '@cosmjs/amino'
-// import { Msg, TxMessage } from "@nibiruchain/nibijs/dist/msg"
-// import {  } from "@nibiruchain/nibijs"
-// import { EncodeObject } from "@cosmjs/proto-signing";
+import express, { Request, Response } from "express";
+import bodyParser from "body-parser";
+import cron from "node-cron";
+import cors from "cors";
+
+// Updated imports for cosmjs
+import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
+import { GasPrice } from "@cosmjs/launchpad";
+import { coins } from "@cosmjs/launchpad";
+import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 
 const app = express();
 const PORT = 3000;
 
-// Middleware to parse JSON body
-app.use(bodyParser.json());
+const endpoint = "https://rpc-nova.comdex.one:443";
+const chainId = "comdex-novanet";
+const gasPrice = GasPrice.fromString("0.025ucmdx");
+const fee = {
+  amount: coins(5000, "ucmdx"),
+  gas: "1000000",
+};
 
-// Enable CORS for all routes
+app.use(bodyParser.json());
 app.use(cors());
 
+const entrypointContract =
+  "comdex1gzyj8lgwuyxv4kgwm74hmtpyp9rm4slywj9zc93y4z32gv83taeq4eulld";
+const swapContract =
+  "comdex1ycvzczy0hz0z69k5tzmxmhdnmuq8dtwlczm0snzlyutnqvq6s9ps07vnys";
+const initialUserOp = {
+  store_swap_order: {
+    to: swapContract,
+    order_requester: swapContract,
+    token_sell: "ucmdx",
+    token_bought: "unusd",
+    quantity_order: "1",
+    swap_upper_usd: "1",
+    swap_lower_usd: "1",
+    minimum_result_accepted_usd: "1",
+    max_in_sell_usd: "1",
+    is_token_out_order: true,
+  },
+};
+const userOpQueue: any[] = [initialUserOp];
+const mnemonic =
+  "clinic puzzle climb card piece scale false suspect nasty blossom world subject struggle swim celery destroy impact horn smart soldier village sea midnight drift";
+let txHash = "";
 
-// Our queue to store UserOp objects
-const userOpQueue: any[] = [];
-const entrypointContract: string = 'nibi1mf6ptkssddfmxvhdx0ech0k03ktp6kf9yk59renau2gvht3nq2gqfdzd2w';
+app.post("/enqueue", (req: Request, res: Response) => {
+  const userOp: any = req.body;
 
-const endpoint = "https://rpc.itn-2.nibiru.fi:443";
-const mnemonic = "";
+  if (!userOp) {
+    return res.status(400).json({ error: "UserOp object is required" });
+  } else {
+    userOpQueue.push(initialUserOp);
+  }
 
-
-// POST endpoint to add a UserOp to the queue
-app.post('/enqueue', (req: Request, res: Response) => {
-    const userOp: any = req.body;
-
-    if (!userOp) {
-        return res.status(400).json({ error: 'UserOp object is required' });
-    }
-
-    userOpQueue.push(userOp);
-    res.json({ status: 'UserOp added to queue' });
+  res.json({ status: "UserOp added to queue" });
 });
 
-// Start the server
+app.get("/txHash", (req: Request, res: Response) => {
+  res.json({ txHash: txHash });
+});
+
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
 
-// Cron job that runs every 5 seconds
-// Cron job that runs every 5 seconds
-cron.schedule('*/5 * * * * *', async () => {
-    console.log('Running the cron job...');
-    try {
-        const signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic);
+cron.schedule("*/5 * * * * *", async () => {
+  console.log("Running the cron job...");
+  try {
+    const signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
+      prefix: "comdex",
+    });
 
-        const client = await SigningCosmWasmClient.connectWithSigner(endpoint, signer);
-        const [firstAccount] = await signer.getAccounts();
-        console.log(firstAccount.address)
-        const incrementMsgs = []; // Array to store the EncodeObject from userOpQueue
-        while (userOpQueue.length > 0) {
-            const userOp: any = userOpQueue.shift();  // Removes the first element from the array
+    const signingClient = await SigningCosmWasmClient.connectWithSigner(
+      endpoint,
+      signer
+    );
+    const [firstAccount] = await signer.getAccounts();
+    console.log(firstAccount.address);
 
-            // Assuming userOp can be transformed into an EncodeObject, we add to incrementMsgs
-            // You might need to modify the below transformation based on your actual data structure.
-            incrementMsgs.push({
-                typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
-                value: {
-                    sender: firstAccount,
-                    contract: entrypointContract,
-                    msg: Buffer.from(JSON.stringify(userOp)).toString("base64"),
-                    sent_funds: [],
-                }
-            });
-        }
-        console.log('test')
-        // signingClient.wasmClient.sign
-        if (incrementMsgs.length > 0) {
-            console.log('bundling.....')
-            // Assuming 'signAndBroadcast' accepts multiple messages
-            // signingClient.wasmClient.signAndBroadcast((await signer.getAccounts())[0].address, incrementMsgs, "auto");
-            const fee = {
-                amount: [{ amount: '5000', denom: 'unibi' }],  // Define appropriate fees
-                gas: '200000',  // Define appropriate gas limit
-            };
-    
-            const result = await client.execute(firstAccount.address, endpoint, incrementMsgs, fee);
-            console.log(result)
-            console.log(`Sent ${incrementMsgs.length} messages to the blockchain.`);
-        } else {
-            console.log('No messages to send.');
-        }   
-    } catch(err) {
-        console.log(err)
+    if (userOpQueue.length == 0) {
+      return;
     }
-    // const txResp = await signingClient.sendTokens(fromAddr, toAddr, tokens, "auto");
+
+    // Rest of the logic remains similar, just make sure to adapt
+    // the message format and client methods to cosmjs
+
+    let callX = JSON.stringify(userOpQueue.pop());
+    const userOp = {
+      Sender: firstAccount.address,
+      Pubkey: "SGVsbG9Xb3JsZA==",
+      To: swapContract,
+      Nonce: "0",
+      Calldata: Buffer.from(callX).toString("base64"), // buffer msg from fe
+      Signature: "SGVsbG9Xb3JsZA==", // buffer sig from fe
+      funds: [],
+    };
+    const handleUserOp = {
+      handle_user_ops: { UserOps: [userOp] },
+    };
+    console.log(handleUserOp);
+
+    const msg1 = {
+      typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
+      value: {
+        sender: firstAccount.address,
+        contract: entrypointContract,
+        msg: Buffer.from(JSON.stringify(handleUserOp)).toString("base64"),
+        sent_funds: [],
+      },
+    };
+
+    const result1 = await signingClient.signAndBroadcast(
+      firstAccount.address,
+      [msg1],
+      fee,
+      ""
+    );
+    console.log(result1);
+
+    const orderId = filterOrderId(result1);
+    console.log(orderId);
+
+    const msg2 = {
+      typeUrl: "/cosmwasm.wasm.v1.MsgExecuteContract",
+      value: {
+        sender: firstAccount.address,
+        contract: swapContract,
+        msg: Buffer.from(
+          JSON.stringify({ execute_swap_order: { order_id: orderId } })
+        ).toString("base64"),
+        sent_funds: [],
+      },
+    };
+
+    const result2 = await signingClient.signAndBroadcast(
+      firstAccount.address,
+      [msg2],
+      {
+        amount: [
+          {
+            denom: "ucmdx",
+            amount: "1000000",
+          },
+        ],
+        gas: "1000000",
+      },
+      ""
+    );
+
+    txHash = result2.transactionHash;
+    console.log(txHash);
+  } catch (err) {
+    console.log(err);
+  }
 });
+
+function filterOrderId(data: any) {
+  for (const event of data.events) {
+    if (event.type === "wasm") {
+      for (const attribute of event.attributes) {
+        if (attribute.key === "orderId") {
+          console.log("Order ID:", attribute.value);
+          return attribute.value;
+        }
+      }
+    }
+  }
+}
