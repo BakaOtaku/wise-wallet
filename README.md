@@ -14,7 +14,7 @@
     ```
 
 ## Abstract
-WiseWallet seeks to redefine the way users interact with decentralized applications and execute transactions on the nibiru blockchain. Through the utilization of account abstraction, off-chain signing, bundlers, and our unique "Limit Hooks" feature, WiseWallet aims to provide an unmatched user experience that is both secure and efficient.
+WiseWallet seeks to redefine the way users interact with decentralized applications and execute transactions on the comdex blockchain. Through the utilization of account abstraction, off-chain signing, bundlers, and our unique "Limit Hooks" feature, WiseWallet aims to provide an unmatched user experience that is both secure and efficient.
 
 ## 1. Introduction
 With the rapid growth of the decentralized finance (DeFi) ecosystem, users demand greater flexibility, user-friendliness, and efficiency in their transactions. WiseWallet's innovative solutions answer this demand by offering a set of features not found together in any existing platform.
