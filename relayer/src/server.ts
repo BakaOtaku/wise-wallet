@@ -2,6 +2,10 @@ import express, { Request, Response } from "express";
 import bodyParser from "body-parser";
 import cron from "node-cron";
 import cors from "cors";
+import * as dotenv from "dotenv";
+
+// Load environment variables
+dotenv.config();
 
 // Updated imports for cosmjs
 import { DirectSecp256k1HdWallet } from "@cosmjs/proto-signing";
@@ -42,8 +46,8 @@ const initialUserOp = {
   },
 };
 const userOpQueue: any[] = [initialUserOp];
-const mnemonic =
-  "clinic puzzle climb card piece scale false suspect nasty blossom world subject struggle swim celery destroy impact horn smart soldier village sea midnight drift";
+// Use environment variable for mnemonic
+const mnemonic = process.env.MNEMONIC || "";
 let txHash = "";
 
 app.post("/enqueue", (req: Request, res: Response) => {
