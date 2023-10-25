@@ -3,7 +3,7 @@
 <h6 align="center">GPT solver, Limit hooks and much more</h6>
 
 - [Presentation File 🗎 🔗](https://github.com/BakaOtaku/wise-wallet/blob/main/WiseWallet.pdf)
-- [Presentation Video 📹 🔗](https://www.youtube.com/watch?v=NkNnJ4hX1eE&feature=youtu.be)
+- [Presentation Video 📹 🔗](https://www.youtube.com/watch?v=PTgNPGU0oII&ab_channel=AmanRaj)
 - - [Documentation 🔗](https://arpitsrivastava2012.gitbook.io/wisewallet/)
 
 - Deployed Contract
