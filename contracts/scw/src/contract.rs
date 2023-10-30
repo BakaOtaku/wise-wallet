@@ -1,12 +1,10 @@
-#[cfg(not(feature = "library"))]
-use cosmwasm_std::entry_point;
 use cosmwasm_std::{
-    to_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Uint64,
+    to_binary, Binary, Deps, Env, MessageInfo, Response, StdResult, Uint64,DepsMut,entry_point
 };
 use cw2::set_contract_version;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, BatchUserOp};
+use crate::msg::{BatchUserOp, ExecuteMsg, InstantiateMsg};
 use crate::state::USER_NONCE;
 use sha2::{Digest, Sha256};
 
@@ -42,8 +40,8 @@ pub fn execute(
 pub mod execute {
     use std::vec;
 
-    use cosmwasm_std::CosmosMsg;
     use crate::msg::BatchUserOp;
+    use cosmwasm_std::CosmosMsg;
 
     use super::*;
     pub fn handle_batch_user_op(
@@ -54,7 +52,7 @@ pub mod execute {
 
         // Check the nonce once for the entire batch
         let usernonce = USER_NONCE
-            .load(deps.storage, batch_op.Sender)
+            .load(deps.storage, batch_op.Sender.clone())
             .unwrap_or_default();
         if usernonce + 1 != batch_op.Nonce.u128() {
             return Err(ContractError::InvalidNonce {
@@ -66,7 +64,7 @@ pub mod execute {
         let mut all_bin_msgs = Vec::new();
         for op in &batch_op.Ops {
             let msg: CosmosMsg<_> = CosmosMsg::Wasm(cosmwasm_std::WasmMsg::Execute {
-                contract_addr: op.To.into_string(),
+                contract_addr: op.To.clone().into_string(),
                 msg: op.Calldata.clone(),
                 funds: op.funds.clone(),
             });
@@ -88,23 +86,21 @@ pub mod execute {
 
         Ok(Response::new().add_messages(msgs))
     }
-
 }
 
-pub fn sha256(msg: &[u8]) -> Result<Vec<u8>, der::error::Error> {
+pub fn sha256(msg: &[u8]) -> Vec<u8> {
     let mut hasher = Sha256::new();
     hasher.update(msg);
-    let result = hasher.finalize().to_vec();
-    Ok(result)
+    return hasher.finalize().to_vec()
 }
 
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::msg::SingleUserOp;
     use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
     use cosmwasm_std::{coins, from_binary, Addr, Uint128};
-    use crate::msg::SingleUserOp;
 
     #[test]
     fn test_handle_batch_user_op() {
@@ -139,10 +135,7 @@ mod tests {
         let result = execute(deps.as_mut(), env.clone(), info.clone(), execute_msg);
 
         // Assert Unauthorized error due to fake signature
-        assert_eq!(
-            result.unwrap_err(),
-            ContractError::Unauthorized {}
-        );
+        assert_eq!(result.unwrap_err(), ContractError::Unauthorized {});
 
         // Additional assertions can be added as required based on the logic
         // For example, you can store and query data similar to the provided test,

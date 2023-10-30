@@ -1,11 +1,13 @@
 use crate::state::SwapOrder;
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{Addr, CustomQuery, Decimal, QuerierWrapper, StdResult, Uint64, Uint128, CustomMsg, CosmosMsg, Coin};
+use cosmwasm_std::{
+    Addr, Coin, CosmosMsg, CustomMsg, CustomQuery, Decimal, QuerierWrapper, StdResult, Uint128,
+    Uint64,
+};
 use std::collections::HashMap;
 
 #[cw_serde]
 pub struct InstantiateMsg {}
-
 
 #[cw_serde]
 pub enum ExecuteMsg {
@@ -20,7 +22,7 @@ pub enum ExecuteMsg {
         minimum_result_accepted_usd: Uint128,
         max_in_sell_usd: Uint128,
         is_token_out_order: bool,
-        pair_id:Option<Uint64>
+        pair_id: Option<Uint64>,
     },
 
     ExecuteSwapOrder {
@@ -28,16 +30,12 @@ pub enum ExecuteMsg {
     },
 }
 
-
-
-
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum QueryMsg {
     // GetCount returns the current count as a json-encoded number
     #[returns(GetOrderResponse)]
     GetOrder { orderId: u64 },
-
 }
 
 // We define a custom struct for each query response

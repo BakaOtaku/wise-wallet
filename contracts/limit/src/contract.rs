@@ -66,7 +66,7 @@ pub fn execute(
             minimum_result_accepted_usd,
             max_in_sell_usd,
             is_token_out_order,
-            pair_id
+            pair_id,
         ),
 
         ExecuteMsg::ExecuteSwapOrder { order_id } => execute_order(deps, order_id.u64()),
@@ -76,14 +76,13 @@ pub fn execute(
 pub mod execute {
     use std::{default, io::Stderr};
 
-    use cosmwasm_std::{CosmosMsg, CustomMsg, WasmMsg, Coin, Uint128, Coins};
+    use cosmwasm_std::{Coin, Coins, CosmosMsg, CustomMsg, Uint128, WasmMsg};
     use cw20::Cw20ExecuteMsg;
     use prost::Message;
     use serde::de;
 
     use super::*;
     use crate::state::{SwapOrder, ORDER_ID_COUNTER, SWAP_ORDER_STORE};
-    
 
     pub fn store_swap_order(
         deps: DepsMut,
@@ -98,7 +97,7 @@ pub mod execute {
         minimum_result_accepted_usd: Uint128,
         max_in_sell_usd: Uint128,
         is_token_out_order: bool,
-        pair_id:Option<Uint64>
+        pair_id: Option<Uint64>,
     ) -> Result<Response, ContractError> {
         let x = info.sender.to_string();
         let swap_order = SwapOrder {
@@ -106,13 +105,13 @@ pub mod execute {
             order_requester,
             token_sell,
             token_bought,
-            quantity_order:quantity_order.into(),
-            swap_upper_usd:swap_upper_usd.into(),
-            swap_lower_usd:swap_lower_usd.into(),
-            minimum_result_accepted_usd:minimum_result_accepted_usd.into(),
-            max_in_sell_usd:max_in_sell_usd.into(),
+            quantity_order: quantity_order.into(),
+            swap_upper_usd: swap_upper_usd.into(),
+            swap_lower_usd: swap_lower_usd.into(),
+            minimum_result_accepted_usd: minimum_result_accepted_usd.into(),
+            max_in_sell_usd: max_in_sell_usd.into(),
             is_token_out_order,
-            pair_id
+            pair_id,
         };
         let order_id =
             ORDER_ID_COUNTER.update(deps.storage, |count| -> StdResult<_> { Ok(count + 1) })?;
@@ -122,32 +121,32 @@ pub mod execute {
         Ok(Response::new().add_attribute("orderId", order_id.to_string()))
     }
 
-    pub fn execute_order(
-        deps: DepsMut,
-        order_id: u64,
-    ) -> Result<Response, ContractError> {
-        let mut swap_order:SwapOrder = SWAP_ORDER_STORE.load(deps.storage, order_id)?;
+    pub fn execute_order(deps: DepsMut, order_id: u64) -> Result<Response, ContractError> {
+        let mut swap_order: SwapOrder = SWAP_ORDER_STORE.load(deps.storage, order_id)?;
         let mut pair = swap_order.token_sell.clone();
-        
-        // perform oracle call, assume 1-1 
-        // bank transfer 
+
+        // perform oracle call, assume 1-1
+        // bank transfer
 
         let mut msg: CosmosMsg;
-        if swap_order.token_bought.eq("ucmdx"){
-            msg = CosmosMsg::Bank(
-                cosmwasm_std::BankMsg::Send { to_address: swap_order.to, amount: vec![Coin::new(swap_order.quantity_order, swap_order.token_bought)] }
-            )
+        if swap_order.token_bought.eq("ucmdx") {
+            msg = CosmosMsg::Bank(cosmwasm_std::BankMsg::Send {
+                to_address: swap_order.to,
+                amount: vec![Coin::new(
+                    swap_order.quantity_order,
+                    swap_order.token_bought,
+                )],
+            })
+        } else {
+            msg = CosmosMsg::Wasm(WasmMsg::Execute {
+                contract_addr: swap_order.token_bought,
+                msg: to_binary(&Cw20ExecuteMsg::Transfer {
+                    recipient: swap_order.to,
+                    amount: Uint128::from(swap_order.quantity_order),
+                })?,
+                funds: vec![],
+            });
         }
-        else {
-        msg = CosmosMsg::Wasm(WasmMsg::Execute {
-            contract_addr: swap_order.token_bought,
-            msg: to_binary(&Cw20ExecuteMsg::Transfer {
-                recipient: swap_order.to,
-                amount: Uint128::from(swap_order.quantity_order)
-            })?,
-            funds: vec![],
-        });
-    }
 
         Ok(Response::new().add_message(msg))
     }
