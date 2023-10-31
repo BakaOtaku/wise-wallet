@@ -1,6 +1,6 @@
 use cosmwasm_schema::write_api;
 
-use entrypoint::msg::{ExecuteMsg, InstantiateMsg};
+use scw::msg::{ExecuteMsg, InstantiateMsg};
 
 fn main() {
     write_api! {

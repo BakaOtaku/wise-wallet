@@ -2,11 +2,15 @@ use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Addr, Binary, Coin, Uint128, Uint64};
 
 #[cw_serde]
-pub struct InstantiateMsg {}
+pub struct InstantiateMsg {
+    pub owner: Addr
+}
 
 #[cw_serde]
 pub enum ExecuteMsg {
     HandleUserOps { UserOps: BatchUserOp },
+    SetRecoveryHelpers { helpers: Vec<Addr> },
+    ChangeOwner { new_owner: Addr },
 }
 
 #[cw_serde]
