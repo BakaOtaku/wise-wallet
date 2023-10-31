@@ -1,5 +1,7 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::{Addr, Binary, Uint128, Uint64, Coin};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -20,4 +22,9 @@ pub struct UserOp {
     pub Signature: Option<Binary>,
     pub funds : Vec<Coin>,
     pub Pubkey: Binary,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct InstantiateMsgWallet {
+    pub owner: Addr,
 }

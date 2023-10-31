@@ -47,9 +47,10 @@ pub mod execute {
     use std::borrow::BorrowMut;
     use std::vec;
 
-    use cosmwasm_std::{Attribute, CosmosMsg, Event, HexBinary, StdError};
+    use cosmwasm_std::{Addr, Attribute, CosmosMsg, Event, HexBinary, StdError};
     use sha2::digest::typenum::private::IsNotEqualPrivate;
     use crate::ContractError::Std;
+    use crate::msg::InstantiateMsgWallet;
 
     use crate::state::{COUNTER, SCW_MAP};
 
@@ -66,13 +67,18 @@ pub mod execute {
                 let code_info = deps.querier.query_wasm_code_info(code_id.clone())?;
                 let canonical_creator = deps.api.addr_canonicalize(env.contract.address.as_str())?;
                 let address = cosmwasm_std::instantiate2_address(&code_info.checksum, &canonical_creator,&op.Pubkey.clone()).unwrap();
+                let instantiate_msg = InstantiateMsgWallet {
+                    owner: Addr::unchecked(op.Sender.clone().to_string()),
+                };
+
+                let serialized_msg = to_binary(&instantiate_msg).unwrap();
                 let msg = CosmosMsg::Wasm(cosmwasm_std::WasmMsg::Instantiate2 {
                     admin: Some(op.Sender.clone().to_string()),
-                    code_id: code_id,
+                    code_id,
                     label: label_counter.clone().into(),
-                    msg: Binary::from_base64("J3t9Jw==").unwrap(),
+                    msg: serialized_msg,
                     funds: vec![],
-                    salt: op.Pubkey
+                    salt: op.Pubkey,
                 });
                 let human_addr= deps.api.addr_humanize(&address.clone())?;
                 // increment and store label counter
