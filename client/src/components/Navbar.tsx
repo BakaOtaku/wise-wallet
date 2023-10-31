@@ -22,7 +22,7 @@ const Navbar = () => {
     <AppBar position="static" classes={{ root: classes.nav }}>
       <Container className={classes.container}>
         <div className={classes.flexContainer}>
-        <NavLink style={{ display: "flex", alignItems: "center" }} to="/">
+          <NavLink style={{ display: "flex", alignItems: "center" }} to="/">
             <img
               src="/img/logo-white.png"
               alt="logo"
@@ -37,18 +37,31 @@ const Navbar = () => {
               ref={menuItemContainerRef}
             >
               <NavLink
+                to="/account"
+                className={(isActive) => `menuItem ${isActive ? "active" : ""}`}
+              >
+                Account
+              </NavLink>
+              {/* <NavLink
+                to="/deploy"
+                className={(isActive) => `menuItem ${isActive ? "active" : ""}`}
+              >
+                Home
+              </NavLink> */}
+
+              <NavLink
                 to="/intent"
                 className={(isActive) => `menuItem ${isActive ? "active" : ""}`}
               >
                 Intents
               </NavLink>
 
-              {/* <NavLink
-                to="/passkeys"
+              <NavLink
+                to="/recover"
                 className={(isActive) => `menuItem ${isActive ? "active" : ""}`}
               >
-                Passkeys
-              </NavLink> */}
+                Social Recovery
+              </NavLink>
 
               <a
                 href="https://arpitsrivastava2012.gitbook.io/wisewallet"

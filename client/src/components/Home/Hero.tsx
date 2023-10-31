@@ -1,4 +1,3 @@
-import { Container, Grid } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import { Link } from "react-router-dom";
 
@@ -32,7 +31,7 @@ const Main = () => {
         <div className={classes.trade}>
           <div className={classes.tradeCont}>
             <div className={classes.btnCont}>
-              <Link to="/intent" className={classes.btn}>
+              <Link to="/account" className={classes.btn}>
                 Live Demo
               </Link>
             </div>

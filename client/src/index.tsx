@@ -3,8 +3,8 @@ import * as ReactDOM from "react-dom/client";
 import { ThemeProvider } from "@emotion/react";
 import { CssBaseline } from "@mui/material";
 import "react-toastify/dist/ReactToastify.css";
-
 import { SigningCosmWasmProvider } from "@/context/cosmwasm";
+import { Web3Provider } from "./context/Web3Auth";
 import theme from "./theme";
 import App from "./App";
 
@@ -17,7 +17,9 @@ root.render(
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <SigningCosmWasmProvider>
-        <App />
+        <Web3Provider>
+          <App />
+        </Web3Provider>
       </SigningCosmWasmProvider>
     </ThemeProvider>
   </React.StrictMode>

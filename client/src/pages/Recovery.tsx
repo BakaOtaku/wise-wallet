@@ -3,18 +3,17 @@ import { ToastContainer } from "react-toastify";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import Intent from "@/components/Intent";
+import RecoveryTable from "@/components/RecoveryTable";
 
-const IntentCont = () => {
+const PasskeysCont = () => {
   const classes = useStyles();
-  // const [input, setInput] = useState("");
 
   return (
     <div className={classes.bgCover}>
       <Navbar />
       <div style={{ borderTop: "2px solid #282b4c" }}></div>
       <div className={classes.market}>
-        <div style={{ height: 20 }}></div>
+        <div style={{ height: 10 }}></div>
         <div className={classes.cont_img}>
           <img
             src="img/logo_main.png"
@@ -24,14 +23,14 @@ const IntentCont = () => {
           />
         </div>
 
-        <div className={classes.contText}>Intent to do a transaction?</div>
+        <div className={classes.contText}>Forgot your keys? No problem.</div>
         <div className={classes.contText2}>
-          Construct a complete transaction for your Wise Smart contract
+          Guardians - A set of trusted friends can help you recover your keys.
           <br />
-          wallet with just a raw string.
+          Threshold - Number of guardians required to recover your keys.
         </div>
-        <div style={{ width: "55%", margin: "auto", marginTop: "5%" }}>
-          <Intent />
+        <div style={{ margin: "30px 50px", }}>
+          <RecoveryTable />
         </div>
       </div>
       <Footer color="rgb(7, 39, 35)" />
@@ -45,11 +44,12 @@ const useStyles = makeStyles(() => ({
     fontFamily: "'Roboto', sans-serif",
     fontWeight: 500,
     backgroundColor: "#f6fefd",
-    background: "url(/img/background.svg) center 71px / auto no-repeat",
+    background:
+      "url(/img/background.svg) center 71px / auto no-repeat",
   },
   market: {
     maxWidth: 1000,
-    minHeight: "75vh",
+    minHeight: "80vh",
     margin: "10px auto",
   },
   cont_img: {
@@ -85,10 +85,10 @@ const useStyles = makeStyles(() => ({
     // whiteSpace: "nowrap",
     fontFamily: "Inter",
     fontWeight: 500,
-    fontSize: 15,
+    fontSize: 14,
     color: "rgba(25, 56, 51, 0.7)",
     textAlign: "center",
   },
 }));
 
-export default IntentCont;
+export default PasskeysCont;

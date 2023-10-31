@@ -7,9 +7,9 @@ import { showErrorMessage } from "@/util";
 import { useSigningClient } from "@/context/cosmwasm";
 
 const contractAddr =
-  "comdex1dr9ztzlwpeqmq5h9c4fapdzftgk5x44nx63t0fhn9fv3v9kjcw3qclf2qk";
+  "neutron1dr9ztzlwpeqmq5h9c4fapdzftgk5x44nx63t0fhn9fv3v9kjcw3qclf2qk";
 const swapAddr =
-  "comdex1tnfwzm9xucghaxg9fsuwkk8skhwmkx5njr3ndyahtrvtu4e824sqlaryf3";
+  "neutron1tnfwzm9xucghaxg9fsuwkk8skhwmkx5njr3ndyahtrvtu4e824sqlaryf3";
 
 const Intent: React.FC = () => {
   const classes = useStyles();
@@ -107,7 +107,7 @@ const Intent: React.FC = () => {
         ),
         funds: [
           {
-            denom: "ucmdx",
+            denom: "untrn",
             amount: "0",
           },
         ],
@@ -122,7 +122,7 @@ const Intent: React.FC = () => {
           amount: [
             {
               amount: "0",
-              denom: "ucmdx",
+              denom: "untrn",
             },
           ],
         },
@@ -154,7 +154,7 @@ const Intent: React.FC = () => {
       });
 
       // promies await to wait for the tx to be mined
-      await new Promise((r) => setTimeout(r, 15000));
+      await new Promise((r) => setTimeout(r, 6000));
 
       const res = await fetch("http://localhost:3000/txHash");
       const resJson = await res.json();

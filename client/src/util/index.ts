@@ -31,10 +31,6 @@ export const showInfoMessage = (message: string) => {
 export const showSuccessMessage = (message: string, txHash?: string) => {
   toast.success(message, {
     onClick: () => {
-      window.open(
-        `https://testnet.explorer.injective.network/transaction/${txHash}/event-logs`,
-        "_blank"
-      );
     },
     position: "top-right",
     autoClose: 5000,

@@ -12,26 +12,26 @@ import { SigningCosmWasmClient } from "@cosmjs/cosmwasm-stargate";
 const app = express();
 const PORT = 3000;
 
-const endpoint = "https://rpc-nova.comdex.one:443";
-const chainId = "comdex-novanet";
-const gasPrice = GasPrice.fromString("0.025ucmdx");
+const endpoint = "https://rpc-falcron.pion-1.ntrn.tech";
+const chainId = "pion-1";
+const gasPrice = GasPrice.fromString("0.025untrn");
 const fee = {
-  amount: coins(5000, "ucmdx"),
-  gas: "1000000",
+  amount: coins(5000, "untrn"),
+  gas: "100000",
 };
 
 app.use(bodyParser.json());
 app.use(cors());
 
 const entrypointContract =
-  "comdex1gzyj8lgwuyxv4kgwm74hmtpyp9rm4slywj9zc93y4z32gv83taeq4eulld";
+  "neutron1gzyj8lgwuyxv4kgwm74hmtpyp9rm4slywj9zc93y4z32gv83taeq4eulld";
 const swapContract =
-  "comdex1ycvzczy0hz0z69k5tzmxmhdnmuq8dtwlczm0snzlyutnqvq6s9ps07vnys";
+  "neutron1ycvzczy0hz0z69k5tzmxmhdnmuq8dtwlczm0snzlyutnqvq6s9ps07vnys";
 const initialUserOp = {
   store_swap_order: {
     to: swapContract,
     order_requester: swapContract,
-    token_sell: "ucmdx",
+    token_sell: "untrn",
     token_bought: "unusd",
     quantity_order: "1",
     swap_upper_usd: "1",
@@ -70,7 +70,7 @@ cron.schedule("*/5 * * * * *", async () => {
   console.log("Running the cron job...");
   try {
     const signer = await DirectSecp256k1HdWallet.fromMnemonic(mnemonic, {
-      prefix: "comdex",
+      prefix: "neutron",
     });
 
     const signingClient = await SigningCosmWasmClient.connectWithSigner(
@@ -141,11 +141,11 @@ cron.schedule("*/5 * * * * *", async () => {
       {
         amount: [
           {
-            denom: "ucmdx",
-            amount: "1000000",
+            denom: "untrn",
+            amount: "100000",
           },
         ],
-        gas: "1000000",
+        gas: "100000",
       },
       ""
     );

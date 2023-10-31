@@ -1,29 +1,40 @@
-import { CircularProgress, Modal } from "@mui/material";
+import { Modal } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { makeStyles } from "@mui/styles";
+import WalletIcon from "@mui/icons-material/Wallet";
+import GoogleIcon from "@mui/icons-material/Google";
+
+import { useWeb3Context } from "@/context/Web3Auth";
+import { useSigningClient } from "@/context/cosmwasm";
+import { useEffect } from "react";
 
 type IModalProps = {
   triggerModal: boolean;
-  isLoading: boolean;
-  txHash: string;
-  txState: any;
+  addr: string;
   setTriggerModal: (value: boolean) => void;
-  signAndSendBundler: () => void;
+  setAddr: (value: string) => void;
 };
 
-const ResultModal = ({
+const ChoiceModal = ({
   triggerModal,
+  addr,
   setTriggerModal,
-  isLoading,
-  txHash,
-  txState,
-  signAndSendBundler,
+  setAddr,
 }: IModalProps) => {
+  const { connectWeb3, address } = useWeb3Context();
+  const { connectWallet, walletAddress } = useSigningClient();
   const classes = useStyles();
 
   const closeModal = () => {
     setTriggerModal(false);
   };
+
+  useEffect(() => {
+    if (address || walletAddress) {
+      setTriggerModal(false);
+      setAddr(address || walletAddress);
+    }
+  }, [address, walletAddress]);
 
   return (
     <Modal
@@ -38,66 +49,25 @@ const ResultModal = ({
         </div>
         <div className={classes.graphicSection}>
           <div className="iconContainer">
-            {/* <img src="/backgrounds/thumbs-up.png" alt="thumb icon" /> */}
             {/* <HexagonGraphic color="#1DBA2D" /> */}
-            {isLoading && !txHash && (
-              <CircularProgress
-                sx={{
-                  marginLeft: "45%",
-                  marginTop: "20%",
-                }}
-                size={40}
-              />
-            )}
-            {txHash && (
-              <div style={{ marginTop: "20%", marginLeft: "10%" }}>
-                ✅ Transaction sent successfully!
-                <br />
-                <a
-                  style={{ wordBreak: "break-all", cursor: "pointer" }}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`https://explorer.rs-testnet.polypore.xyz/pion-1/tx/${txHash}`}
-                >
-                  <code
-                    style={{
-                      marginLeft: "10px",
-                      color: "blue",
-                    }}
-                  >
-                    Explorer - {txHash}
-                  </code>
-                </a>
+
+            <div className={classes.textSection}>
+              <div className={classes.btnCont}>
+                <button onClick={() => connectWallet()} className={classes.btn}>
+                  <WalletIcon />
+                  Keplr Wallet
+                </button>
               </div>
-            )}
-            {!isLoading && !txHash && (
-              <code>
-                <pre>
-                  {JSON.stringify(
-                    {
-                      type: txState?.type,
-                      quantityToSwap: txState?.quantity,
-                      timeStampLimit: txState?.time,
-                      tokenAmount: txState?.token_amount,
-                      tokenIn: txState?.token_in,
-                      tokenOut: txState?.token_out,
-                    },
-                    null,
-                    4
-                  )}
-                </pre>
-              </code>
-            )}
-          </div>
-        </div>
-        <div className={classes.textSection}>
-          <div className={classes.btnCont}>
-            <button
-              onClick={() => signAndSendBundler()}
-              className={classes.btn}
-            >
-              Sign and Send Tx
-            </button>
+            </div>
+
+            <div className={classes.textSection}>
+              <div className={classes.btnCont}>
+                <button onClick={() => connectWeb3()} className={classes.btn}>
+                  <GoogleIcon sx={{ marginRight: 25 }} />
+                  Social Login
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -120,7 +90,7 @@ const useStyles = makeStyles(() => ({
     padding: "20px",
     backgroundColor: "#fff",
     borderRadius: "16px",
-    width: "500px",
+    width: "350px",
     color: "#000",
     outline: "none",
     boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
@@ -130,7 +100,7 @@ const useStyles = makeStyles(() => ({
   },
   graphicSection: {
     position: "relative",
-    height: "250px",
+    height: "200px",
     backgroundColor: "#E3DEFF",
     borderRadius: "8px",
     marginTop: "40px",
@@ -219,6 +189,7 @@ const useStyles = makeStyles(() => ({
   btn: {
     padding: "9px 40px",
     boxSizing: "border-box",
+    display: "flex",
     background: "rgb(151, 252, 228)",
     borderRadius: 60,
     fontSize: 20,
@@ -238,4 +209,4 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-export default ResultModal;
+export default ChoiceModal;

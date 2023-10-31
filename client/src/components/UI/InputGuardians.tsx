@@ -1,28 +1,33 @@
-import { CircularProgress, Modal } from "@mui/material";
+import { CircularProgress, InputBase, Modal } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { makeStyles } from "@mui/styles";
 
 type IModalProps = {
   triggerModal: boolean;
-  isLoading: boolean;
+  inputValue: any;
+  loading: boolean;
   txHash: string;
-  txState: any;
   setTriggerModal: (value: boolean) => void;
-  signAndSendBundler: () => void;
+  setInputValue: (value: any) => void;
+  setGuardians: () => void;
+  setIsLoading: (value: boolean) => void;
 };
 
-const ResultModal = ({
+const InputGuardians = ({
   triggerModal,
   setTriggerModal,
-  isLoading,
+  inputValue,
+  setInputValue,
+  setGuardians,
+  loading,
   txHash,
-  txState,
-  signAndSendBundler,
+  setIsLoading,
 }: IModalProps) => {
   const classes = useStyles();
 
   const closeModal = () => {
     setTriggerModal(false);
+    setIsLoading(false);
   };
 
   return (
@@ -36,66 +41,57 @@ const ResultModal = ({
         <div className={classes.closeModal} onClick={closeModal}>
           <Close style={{ fontSize: "16px" }} />
         </div>
+
         <div className={classes.graphicSection}>
-          <div className="iconContainer">
-            {/* <img src="/backgrounds/thumbs-up.png" alt="thumb icon" /> */}
-            {/* <HexagonGraphic color="#1DBA2D" /> */}
-            {isLoading && !txHash && (
-              <CircularProgress
-                sx={{
-                  marginLeft: "45%",
-                  marginTop: "20%",
-                }}
-                size={40}
-              />
-            )}
-            {txHash && (
-              <div style={{ marginTop: "20%", marginLeft: "10%" }}>
-                ✅ Transaction sent successfully!
-                <br />
-                <a
-                  style={{ wordBreak: "break-all", cursor: "pointer" }}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`https://explorer.rs-testnet.polypore.xyz/pion-1/tx/${txHash}`}
-                >
-                  <code
-                    style={{
-                      marginLeft: "10px",
-                      color: "blue",
-                    }}
-                  >
-                    Explorer - {txHash}
-                  </code>
-                </a>
+          {!loading && !txHash && (
+            <div className="iconContainer">
+              Add array of guardians...
+              <div style={{ marginTop: 20 }}>
+                <InputBase
+                  className={classes.input}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  placeholder="[neutron12345...,  neutron23456...]"
+                  sx={{ width: "100%", borderRadius: 50, paddingLeft: 2 }}
+                />
               </div>
-            )}
-            {!isLoading && !txHash && (
-              <code>
-                <pre>
-                  {JSON.stringify(
-                    {
-                      type: txState?.type,
-                      quantityToSwap: txState?.quantity,
-                      timeStampLimit: txState?.time,
-                      tokenAmount: txState?.token_amount,
-                      tokenIn: txState?.token_in,
-                      tokenOut: txState?.token_out,
-                    },
-                    null,
-                    4
-                  )}
-                </pre>
-              </code>
-            )}
-          </div>
+            </div>
+          )}
+          {loading && !txHash && (
+            <CircularProgress
+              sx={{
+                marginLeft: "45%",
+                marginTop: "10%",
+              }}
+              size={40}
+            />
+          )}
+          {txHash && (
+            <div style={{ marginTop: "10%", marginLeft: "10%" }}>
+              🔏 Guardians added successfully!
+              <br />
+              <a
+                style={{ wordBreak: "break-all", cursor: "pointer" }}
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`https://explorer.rs-testnet.polypore.xyz/pion-1/tx/${txHash}`}
+              >
+                <code
+                  style={{
+                    marginLeft: "10px",
+                    color: "blue",
+                    fontSize: "14px",
+                  }}
+                >
+                  Explorer: {txHash}
+                </code>
+              </a>
+            </div>
+          )}
         </div>
         <div className={classes.textSection}>
           <div className={classes.btnCont}>
-            <button
-              onClick={() => signAndSendBundler()}
-              className={classes.btn}
-            >
+            <button onClick={setGuardians} className={classes.btn}>
               Sign and Send Tx
             </button>
           </div>
@@ -130,7 +126,7 @@ const useStyles = makeStyles(() => ({
   },
   graphicSection: {
     position: "relative",
-    height: "250px",
+    height: "150px",
     backgroundColor: "#E3DEFF",
     borderRadius: "8px",
     marginTop: "40px",
@@ -236,6 +232,14 @@ const useStyles = makeStyles(() => ({
     color: "#7533E2",
     textDecoration: "underline",
   },
+  input: {
+    color: "white",
+    backgroundColor: "rgba(255, 255, 255, 0.9)",
+    transition: "background-color 0.3s ease-in-out",
+    "&:hover": {
+      backgroundColor: "rgba(255, 255, 255, 0.6)",
+    },
+  },
 }));
 
-export default ResultModal;
+export default InputGuardians;

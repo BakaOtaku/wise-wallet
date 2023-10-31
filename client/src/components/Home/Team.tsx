@@ -1,5 +1,4 @@
-// import { GitHub } from "@mui/icons-material";
-import { Container, Typography, Grid } from "@mui/material";
+import { Container, Grid } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 
 const Team = () => {
@@ -12,8 +11,9 @@ const Team = () => {
           <Grid item xs={12} sm={6}>
             <h1 className={classes.title}>Team</h1>
             <div className={classes.text}>
-              We are a team of 3 engineers working togerther on blockchain since
-              college.
+              We are a team of three engineers working togerther for past 3
+              years. With a collective background on different technologies, our
+              journey has guided us through numerous successful projects.
             </div>
           </Grid>
 
@@ -98,7 +98,7 @@ const useStyles = makeStyles(() => ({
     color: "rgb(25, 56, 51)",
   },
   text: {
-    fontSize: 20,
+    fontSize: 17,
     fontWeight: "400",
     color: "rgba(25, 56, 51, 0.8)",
     fontFamily: "Inter",

@@ -1,9 +1,10 @@
 import { useState } from "react";
 // @ts-ignore
 import Blockies from "react-blockies";
-
 import { makeStyles } from "@mui/styles";
 import { useSigningClient } from "@/context/cosmwasm";
+import { useWeb3Context } from "@/context/Web3Auth";
+import ChoiceModal from "./UI/ChoiceModal";
 
 const truncateAddress = (address: string) => {
   return address.slice(0, 6) + "..." + address.slice(-4);
@@ -11,30 +12,46 @@ const truncateAddress = (address: string) => {
 
 const ConnectWallet = () => {
   const classes = useStyles();
-  const { walletAddress, connectWallet, disconnect } = useSigningClient();
+  const [addr, setAddr] = useState("");
+  const { disconnect: dissconnectWallet } = useSigningClient();
+  const { disconnect } = useWeb3Context();
   const [showLogout, setShowLogout] = useState(false);
+  const [choice, setChoice] = useState(false);
 
   const toggleLogoutButton = () => {
+    navigator.clipboard.writeText(addr);
     showLogout ? setShowLogout(false) : setShowLogout(true);
+  };
+
+  const connectChoice = () => {
+    setChoice(true);
   };
 
   const disconnectWallet = () => {
     disconnect();
+    // dissconnectWallet();
+    setAddr("");
     setShowLogout(false);
   };
 
   return (
     <div className={classes.walletBtnContainer}>
+      <ChoiceModal
+        triggerModal={choice}
+        setTriggerModal={setChoice}
+        addr={addr}
+        setAddr={setAddr}
+      />
       <button
         className={classes.walletBtn}
-        onClick={walletAddress ? toggleLogoutButton : connectWallet}
+        onClick={addr ? toggleLogoutButton : connectChoice}
       >
         <Blockies
-          className={`${classes.img} ${walletAddress ? "green" : "red"}`}
-          seed={walletAddress ? walletAddress : ""}
+          className={`${classes.img} ${addr ? "green" : "red"}`}
+          seed={addr ? addr : ""}
         />
         <div style={{ fontFamily: "Roboto", fontWeight: 700 }}>
-          {walletAddress ? truncateAddress(walletAddress) : "Connect Wallet"}
+          {addr ? truncateAddress(addr) : "Connect Wallet"}
         </div>
       </button>
       {showLogout && (

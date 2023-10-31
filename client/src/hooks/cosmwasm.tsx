@@ -11,8 +11,8 @@ export interface ISigningCosmWasmClientContext {
   disconnect: Function;
 }
 
-const PUBLIC_RPC_ENDPOINT = "https://rpc-nova.comdex.one:443";
-const PUBLIC_CHAIN_ID = "comdex-novanet";
+const PUBLIC_RPC_ENDPOINT = "https://rpc-falcron.pion-1.ntrn.tech";
+const PUBLIC_CHAIN_ID = "pion-1";
 // const GAS_PRICE = "0.001";
 
 export const useSigningCosmWasmClient = (): ISigningCosmWasmClientContext => {

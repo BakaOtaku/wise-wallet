@@ -1,13 +1,13 @@
+import { useState } from "react";
 import { makeStyles } from "@mui/styles";
 import { ToastContainer } from "react-toastify";
 
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import Intent from "@/components/Intent";
+// import Passkeys from "@/components/Passkey";
 
-const IntentCont = () => {
+const PasskeysCont = () => {
   const classes = useStyles();
-  // const [input, setInput] = useState("");
 
   return (
     <div className={classes.bgCover}>
@@ -24,14 +24,25 @@ const IntentCont = () => {
           />
         </div>
 
-        <div className={classes.contText}>Intent to do a transaction?</div>
-        <div className={classes.contText2}>
-          Construct a complete transaction for your Wise Smart contract
-          <br />
-          wallet with just a raw string.
+        <div className={classes.contText}>
+          Wise Wallet - Bringing best UX to Cosmos.
         </div>
-        <div style={{ width: "55%", margin: "auto", marginTop: "5%" }}>
-          <Intent />
+        <div className={classes.contText2}>
+          With Wise wallets, you can build powerful and easy-to-use Web3
+          <br />
+          applications that are only possible with account abstraction (AA).
+        </div>
+        <div style={{ width: "100%", margin: "auto" }}>
+          <button
+            onClick={() => {}}
+            className={classes.btn}
+            style={{
+              margin: "auto",
+              marginTop: "5%",
+            }}
+          >
+            Deploy your wallet →
+          </button>
         </div>
       </div>
       <Footer color="rgb(7, 39, 35)" />
@@ -49,7 +60,7 @@ const useStyles = makeStyles(() => ({
   },
   market: {
     maxWidth: 1000,
-    minHeight: "75vh",
+    minHeight: "80vh",
     margin: "10px auto",
   },
   cont_img: {
@@ -72,16 +83,16 @@ const useStyles = makeStyles(() => ({
   },
   contText: {
     margin: "8px auto",
-    // whiteSpace: "nowrap",
+    whiteSpace: "nowrap",
     fontFamily: "Inter",
     fontWeight: 500,
     fontSize: 28,
-    marginTop: 30,
-    color: "rgba(25, 56, 51, 1)",
+    marginTop: 20,
+    color: "rgba(25, 56, 51, 0.9)",
     textAlign: "center",
   },
   contText2: {
-    margin: "8px auto",
+    margin: "15px auto",
     // whiteSpace: "nowrap",
     fontFamily: "Inter",
     fontWeight: 500,
@@ -89,6 +100,37 @@ const useStyles = makeStyles(() => ({
     color: "rgba(25, 56, 51, 0.7)",
     textAlign: "center",
   },
+  btn: {
+    margin: "20px 0 20px 40%",
+    background: "rgb(40,43,76, 0.9)",
+    cursor: "pointer",
+    border: 0,
+    outline: "none",
+    borderRadius: 5,
+    height: "36px",
+    fontSize: 18,
+    lineHeight: "36px",
+    padding: "0 18px 0 18px",
+    borderBottom: "1px solid #000",
+    display: "flex",
+    alignItems: "center",
+    color: "white",
+
+    "@media (max-width:599px)": {
+      padding: 0,
+    },
+
+    "&:hover": {
+      backgroundColor: "rgb(40,43,76, 0.8)",
+    },
+
+    "& div": {
+      "@media (max-width:599px)": {
+        margin: 0,
+        display: "none",
+      },
+    },
+  },
 }));
 
-export default IntentCont;
+export default PasskeysCont;
